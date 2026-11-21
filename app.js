@@ -165,6 +165,12 @@ $('#nick').addEventListener('input', e => {
   if (nome.trim()) { $('#nickdica').hidden = true; e.target.removeAttribute('aria-invalid') }
   pessoas[myId] = nome.trim(); render();
   clearTimeout(nickTimer);
+  // nome igual ao de outra pessoa: provavelmente é ela noutro dispositivo; não gravar um duplicado sem perguntar
+  const norm = s => s.trim().toLocaleLowerCase('pt').normalize('NFD').replace(/\p{M}/gu, '');
+  dupId = nome.trim() ? Object.keys(pessoas).find(id => id !== myId && norm(pessoas[id]) === norm(nome)) : undefined;
+  const dup = $('#nickdup');
+  dup.hidden = !dupId;
+  if (dupId) { dup.innerHTML = `<span>Já existe <b>${esc(pessoas[dupId].trim())}</b> no grupo. É o teu nome?</span> <button type="button" id="soueu">Sou eu</button>`; return }
   nickTimer = setTimeout(async () => {
     if (!sb) return;
     const { error } = await sb.from('pessoas').upsert({ id: myId, nome: nome.trim() });
@@ -172,8 +178,9 @@ $('#nick').addEventListener('input', e => {
     else { pessoaGuardada = true; if (!pendente) toast('Nome guardado.') }
   }, 600);
 });
+let dupId;
 function aplicarPendente(){
-  if (!pendente || !$('#nick').value.trim()) return;
+  if (!pendente || !$('#nick').value.trim() || dupId) return;   // com nome repetido, espera pelo "Sou eu"
   const { k, v } = pendente; pendente = null;
   clearTimeout(nickTimer); pessoaGuardada = false;   // o setDia grava o nome e a marcação de uma vez
   if (mine()[k] !== v) setDia(k, v);   // setDia alterna: não desmarcar se já estava assim
@@ -186,24 +193,28 @@ function serComo(id, nome){
   myId = id; store.set('fds_id', id); pessoaGuardada = pessoas[id] !== undefined;
   $('#nick').value = nome; store.set('fds_nome', nome);
   $('#nickdica').hidden = true; $('#nick').removeAttribute('aria-invalid');
+  dupId = undefined; $('#nickdup').hidden = true;
   render();
+}
+function trocarPara(id){
+  const antes = { id: myId, nome: $('#nick').value };
+  serComo(id, pessoas[id] || '');
+  toast('Agora marcas como '+nameOf(id)+'.', false, { label: 'Desfazer', fn: () => {
+    serComo(antes.id, antes.nome);
+    toast(antes.nome.trim() ? 'Voltaste a marcar como '+antes.nome.trim()+'.' : 'Troca desfeita.');
+    $('#nick').focus();
+  }});
+  aplicarPendente();
 }
 // Escolher um nome não troca logo: pede "Sou eu" e depois oferece "Desfazer"
 $('#claim').addEventListener('change', e => {
   const id = e.target.value; e.target.value = ''; if (!id) return;
-  const antes = { id: myId, nome: $('#nick').value };
-  toast('Marcar como '+nameOf(id)+'?', false, { label: 'Sou eu', fn: () => {
-    serComo(id, pessoas[id] || '');
-    toast('Agora marcas como '+nameOf(id)+'.', false, { label: 'Desfazer', fn: () => {
-      serComo(antes.id, antes.nome);
-      toast(antes.nome.trim() ? 'Voltaste a marcar como '+antes.nome.trim()+'.' : 'Troca desfeita.');
-      $('#claim').focus();
-    }});
-  }});
+  toast('Marcar como '+nameOf(id)+'?', false, { label: 'Sou eu', fn: () => trocarPara(id) });
 });
 
 document.addEventListener('click', e => {
   if (e.target.closest('.toast button') && toastAcao) { toastAcao.fn(); return }
+  if (e.target.id === 'soueu' && dupId) { trocarPara(dupId); return }
   const bt = e.target.closest('.pick button');
   if (bt) { setDia(bt.dataset.k, bt.dataset.v); return }
   if (e.target.id === 'more') { weeksShown += 4; render() }

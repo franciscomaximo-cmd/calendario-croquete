@@ -79,6 +79,8 @@ input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid 
 
 .status{font-size:14px;color:var(--mute);margin-top:18px}
 .pastline{display:none;background:var(--bg);color:var(--mute);font-size:14px;padding:8px 12px;margin:0}
+.dup{flex-basis:100%;margin:0;font-size:14px;display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px}
+.dup button{font:600 14px var(--font);min-height:44px;padding:0 14px;border-radius:8px;border:1px solid var(--yes);background:var(--yes);color:var(--yesink);cursor:pointer}
 .dica-erro{flex-basis:100%;margin:0;font-size:14px;font-weight:600;color:var(--erro);max-width:60ch}
 input[aria-invalid=true]{border-color:var(--erro);border-width:2px}
 .toast{position:fixed;left:50%;bottom:max(16px,env(safe-area-inset-bottom));z-index:10;max-width:calc(100% - 32px);width:max-content;
