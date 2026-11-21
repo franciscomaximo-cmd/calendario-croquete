@@ -32,15 +32,18 @@ input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid 
 .dot{width:12px;height:12px;border-radius:3px;display:inline-block}
 .dot.y{background:var(--yes)}.dot.m{background:var(--maybe)}.dot.n{background:var(--no)}
 
-/* Melhor dia */
-.best{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 16px;align-items:center;margin:20px 0 28px;padding:16px 0;border-block:1px solid var(--line)}
-.best .big{font:800 44px/1 var(--font);grid-row:span 2;color:var(--yes);font-variant-numeric:tabular-nums}
-.best .t{font:700 20px/1.2 var(--font)}
-.best .s{color:var(--mute);font-size:15px}
-.best.empty .big{color:var(--line)}
-.best .top3{grid-column:1/-1;margin-top:10px;font-size:15px}
-.best .top3 b{font-weight:700}
+/* Melhor dia: a data é o herói */
+.best{margin:20px 0 28px;padding:18px 0;border-block:1px solid var(--line)}
+.best .t{font:800 clamp(28px,6vw,40px)/1.1 var(--font);letter-spacing:-.02em;margin:0;text-wrap:balance}
+.best .t .lbl{font-weight:500;color:var(--mute)}
+.best .t a{color:inherit;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:6px;text-decoration-color:var(--maybe)}
+.best.empty .t{font-size:22px}
+.best .s{color:var(--mute);font-size:16px;margin:6px 0 0}
+.best .top3{margin-top:14px;font-size:15px}
+.best .top3 b{font-size:14px;font-weight:600;color:var(--mute)}
 .best .top3 ol{margin:4px 0 0;padding-left:22px}
+.best .top3 a{color:inherit;text-underline-offset:3px;font-weight:600}
+.day{scroll-margin-top:16px}
 
 /* Semanas: grelha de linhas finas, como um horário */
 .weeks{display:grid;gap:32px}
@@ -69,7 +72,6 @@ input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid 
 .warn{background:var(--maybe);color:var(--maybeink);border-radius:8px;padding:12px 14px;margin-bottom:16px;font-size:15px}
 .more{margin-top:24px;font:600 15px var(--font);min-height:44px;padding:0 18px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
 
-@media(max-width:599px){.best{grid-template-columns:minmax(0,1fr)}.best .big{grid-row:auto}}
 @media(min-width:600px){.days{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}.pick{grid-template-columns:minmax(0,1fr)}}
 @media(min-width:900px){.days{grid-template-columns:repeat(7,minmax(0,1fr))}.only-we .days{grid-template-columns:repeat(3,minmax(0,1fr))}.day{padding:10px}}
 @media(prefers-reduced-motion:no-preference){.bar i{transition:width .3s ease}}

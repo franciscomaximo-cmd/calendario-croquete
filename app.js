@@ -48,7 +48,7 @@ function render(){
       const y = ans.filter(a => a.v==='y').length, m = ans.filter(a => a.v==='m').length;
       if (!past && y > 0) cands.push({y, m, k, name, d});
       const my = mine()[k] || '';
-      return `<div class="day${off>=5 ? ' we' : ''}${past ? ' past' : ''}" data-k="${k}">
+      return `<div class="day${off>=5 ? ' we' : ''}${past ? ' past' : ''}" data-k="${k}" id="d-${k}">
         <div class="dname">${name}<span class="n">${fmt(d)}</span></div>
         <div class="bar" aria-label="${y} livres, ${m} talvez"><i style="width:${y/grupo*100}%;background:var(--yes)"></i><i style="width:${m/grupo*100}%;background:var(--maybe)"></i></div>
         <div class="who">${ans.map(a => `<span class="chip ${a.v}" title="${LABEL[a.v]}">${esc(nameOf(a.id))}</span>`).join('') || '<span style="color:var(--mute);font-size:13px">Sem respostas</span>'}</div>
@@ -57,7 +57,8 @@ function render(){
         </div>`}</div>`;
     }).join('');
     const title = wi===0 ? 'Esta semana' : wi===1 ? 'Próxima semana' : 'Semana de '+fmt(seg);
-    return `<article class="wk"><header><h2>${title}</h2><small>${fmt(seg)} – ${fmt(dom)}</small></header><div class="days">${days}</div></article>`;
+    const range = wi < 2 ? `${fmt(seg)} – ${fmt(dom)}` : `até ${fmt(dom)}`;
+    return `<article class="wk"><header><h2>${title}</h2><small>${range}</small></header><div class="days">${days}</div></article>`;
   }).join('');
 
   // Mais livres primeiro, depois mais "talvez", depois o mais cedo
@@ -66,15 +67,15 @@ function render(){
   const b = $('#best');
   if (best) {
     b.className = 'best';
-    b.innerHTML = `<div class="big">${best.y}${best.m ? `<span style="font-size:.45em">+${best.m}</span>` : ''}</div>
-      <div class="t">Melhor dia: ${best.name}, ${fmt(best.d)}</div>
-      <div class="s">${best.y} ${best.y===1 ? 'pessoa livre' : 'pessoas livres'}${best.m ? ` e ${best.m} talvez` : ''}, de ${grupo} no grupo.</div>
+    const conta = c => `${c.y} ${c.y===1 ? 'livre' : 'livres'}${c.m ? ` e ${c.m} talvez` : ''}`;
+    b.innerHTML = `<h2 class="t"><span class="lbl">Melhor dia:</span> <a href="#d-${best.k}">${best.name}, ${fmt(best.d)}</a></h2>
+      <p class="s">${conta(best)}, de ${grupo} ${grupo===1 ? 'pessoa' : 'pessoas'}.</p>
       ${cands.length > 1 ? `<div class="top3"><b>Top 3</b><ol>${cands.slice(0,3).map(c =>
-        `<li>${c.name}, ${fmt(c.d)} · ${c.y} ${c.y===1 ? 'livre' : 'livres'}${c.m ? `, ${c.m} talvez` : ''}</li>`).join('')}</ol></div>` : ''}`;
+        `<li><a href="#d-${c.k}">${c.name}, ${fmt(c.d)}</a> · ${conta(c)}</li>`).join('')}</ol></div>` : ''}`;
     const el = document.querySelector(`.day[data-k="${best.k}"]`); if (el) el.classList.add('top');
   } else {
     b.className = 'best empty';
-    b.innerHTML = '<div class="big">—</div><div class="t">Ainda ninguém está livre</div><div class="s">Começa por marcar os teus dias livres.</div>';
+    b.innerHTML = '<h2 class="t">Ainda ninguém está livre</h2><p class="s">Marca os dias em que podes e o melhor aparece aqui.</p>';
   }
 
   const sel = $('#claim'), cur = sel.value;
