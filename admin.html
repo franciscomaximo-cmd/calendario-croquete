@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Admin da croquetada</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='9' width='26' height='14' rx='7' fill='%23f2c230' stroke='%231d1b17' stroke-width='2.5'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topo"><div class="wrap">
+  <h1>Admin da croquetada</h1>
+</div></header>
+
+<main class="band"><div class="wrap">
+  <div id="warn"></div>
+  <form class="login" id="login" hidden>
+    <label class="campo">Email
+      <input type="email" id="email" autocomplete="username" required>
+    </label>
+    <label class="campo">Password
+      <input type="password" id="pass" autocomplete="current-password" required>
+    </label>
+    <p class="dica-erro" id="loginerro" role="alert" hidden></p>
+    <button class="btn" type="submit">Entrar</button>
+  </form>
+  <section id="painel" hidden>
+    <div class="barra">
+      <p class="status" id="quem"></p>
+      <button class="sec" id="sair" type="button">Sair</button>
+    </div>
+    <h2>Pessoas</h2>
+    <ul class="pessoas" id="lista"></ul>
+  </section>
+  <p class="status" id="status" role="status">A ligar…</p>
+</div></main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

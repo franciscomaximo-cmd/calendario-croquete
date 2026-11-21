@@ -39,6 +39,10 @@ Fonte do sistema (`--font`), sem fontes externas. Papéis: título do grupo 24�
 - **Estado da ligação:** 14px em `--mute` logo por baixo do melhor dia ("7 pessoas no grupo. Atualiza sozinho…"); erros de ligação ou de tempo real em `--erro` a 600.
 - **Aviso (toast):** fixo em baixo, tinta sobre fundo invertido; erro em `--erro`. Pode levar um botão de ação (44px, recebe o foco, 8s): escolher um nome em "Já marcaste noutro dispositivo?" pede "Sou eu" e depois oferece "Desfazer".
 
+## Admin (`admin.html`)
+
+Mesmo sistema: faixa do título, campos e botões iguais. Login numa coluna (máx. 320px). Lista de pessoas em linhas finas como os dias; nomes repetidos com fundo `--best` e etiqueta "repetido" em `--maybe`. Botões secundários `.sec` (contorno `--edge`); Apagar com contorno e texto `--erro`. Confirmações com `confirm()` nativo.
+
 ## Movimento
 
 Só a barra (transform `scaleX`) e o aviso (opacidade + 8px), ambos com ease-out e desligados com `prefers-reduced-motion`.

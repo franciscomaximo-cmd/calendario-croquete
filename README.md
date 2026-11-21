@@ -11,6 +11,7 @@ Calendário partilhado para o grupo marcar, em cada dia da semana (segunda a dom
 | `app.js` | Lógica, leitura/escrita no Supabase e tempo real |
 | `config.js` | URL e chave pública do teu projeto Supabase |
 | `supabase.sql` | Tabelas e permissões a criar no Supabase |
+| `admin.html`, `admin.js` | Página de admin (login, mudar nomes, juntar e apagar pessoas) |
 | `admin.sql` | Permissões do admin e função de juntar pessoas (correr depois do `supabase.sql`) |
 
 ## 1. Criar a base de dados (Supabase, grátis)
@@ -35,7 +36,7 @@ Abre a pasta no VS Code, instala a extensão **Live Server** e faz clique direit
 
 ## 4. Admin (opcional)
 
-Para mudar nomes, juntar pessoas repetidas e apagar pessoas. Segue as instruções no topo de `admin.sql` (criar o teu utilizador, desligar registos, pôr o teu email) e corre-o no **SQL Editor**. A anon key do site continua sem poder apagar pessoas.
+Para mudar nomes, juntar pessoas repetidas e apagar pessoas. Segue as instruções no topo de `admin.sql` (criar o teu utilizador, desligar registos, pôr o teu email) e corre-o no **SQL Editor**. Depois abre `/admin.html` e entra com o email e a password que criaste. A anon key do site continua sem poder apagar pessoas, e a página de admin usa só essa chave pública: o que o admin pode fazer decide-se no Supabase.
 
 ## Notas
 
