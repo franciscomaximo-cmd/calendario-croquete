@@ -93,11 +93,17 @@ function render(){
 function status(t){ $('#status').textContent = t }
 
 // Aviso curto em baixo do ecrã, perto de onde se toca
-let toastTimer = null;
-function toast(t, erro){
+let toastTimer = null, toastAcao = null;
+function toast(t, erro, acao){   // acao = { label, fn }: botão no aviso, que recebe o foco
   const el = $('#toast');
   el.textContent = t; el.classList.toggle('erro', !!erro); el.classList.add('on');
-  clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('on'), erro ? 6000 : 2200);
+  toastAcao = acao || null;
+  el.classList.toggle('acao', !!acao);
+  if (acao) { const b = document.createElement('button'); b.type = 'button'; b.textContent = acao.label; el.append(' ', b); b.focus() }
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => {
+    if (el.contains(document.activeElement)) $('#claim').focus();   // não deixar o foco perdido num aviso escondido
+    el.classList.remove('on', 'acao'); toastAcao = null;
+  }, acao ? 8000 : erro ? 6000 : 2200);
 }
 function erroPt(acao, e){
   console.error(acao, e);
@@ -161,15 +167,28 @@ $('#nick').addEventListener('input', e => {
   }, 600);
 });
 
-$('#claim').addEventListener('change', e => {
-  const id = e.target.value; if (!id) return;
-  myId = id; store.set('fds_id', id); pessoaGuardada = true;
-  $('#nick').value = pessoas[id] || ''; store.set('fds_nome', $('#nick').value);
+function serComo(id, nome){
+  myId = id; store.set('fds_id', id); pessoaGuardada = pessoas[id] !== undefined;
+  $('#nick').value = nome; store.set('fds_nome', nome);
   $('#nickdica').hidden = true; $('#nick').removeAttribute('aria-invalid');
-  e.target.value = ''; render(); toast('Agora estás a marcar como '+nameOf(id)+'.');
+  render();
+}
+// Escolher um nome não troca logo: pede "Sou eu" e depois oferece "Desfazer"
+$('#claim').addEventListener('change', e => {
+  const id = e.target.value; e.target.value = ''; if (!id) return;
+  const antes = { id: myId, nome: $('#nick').value };
+  toast('Marcar como '+nameOf(id)+'?', false, { label: 'Sou eu', fn: () => {
+    serComo(id, pessoas[id] || '');
+    toast('Agora marcas como '+nameOf(id)+'.', false, { label: 'Desfazer', fn: () => {
+      serComo(antes.id, antes.nome);
+      toast(antes.nome.trim() ? 'Voltaste a marcar como '+antes.nome.trim()+'.' : 'Troca desfeita.');
+      $('#claim').focus();
+    }});
+  }});
 });
 
 document.addEventListener('click', e => {
+  if (e.target.closest('.toast button') && toastAcao) { toastAcao.fn(); return }
   const bt = e.target.closest('.pick button');
   if (bt) { setDia(bt.dataset.k, bt.dataset.v); return }
   if (e.target.id === 'more') { weeksShown += 4; render() }

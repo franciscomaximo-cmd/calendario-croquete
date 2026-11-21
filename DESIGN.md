@@ -36,7 +36,7 @@ Fonte do sistema (`--font`), sem fontes externas. Papéis: título do grupo 24�
 - **Botões de estado:** 44px de altura, contorno `--edge`; escolhido = cor do estado + ✓ em SVG.
 - **Nomes:** etiqueta com a cor do estado; Talvez leva "?" e Ocupado é riscado (não depende só da cor).
 - **Melhor dia:** frase "Melhor dia: <data>" com a data em ligação para o dia; Top 3 por baixo.
-- **Aviso (toast):** fixo em baixo, tinta sobre fundo invertido; erro em `--erro`.
+- **Aviso (toast):** fixo em baixo, tinta sobre fundo invertido; erro em `--erro`. Pode levar um botão de ação (44px, recebe o foco, 8s): escolher um nome em "Já marcaste noutro dispositivo?" pede "Sou eu" e depois oferece "Desfazer".
 
 ## Movimento
 

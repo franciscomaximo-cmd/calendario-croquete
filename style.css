@@ -84,6 +84,9 @@ input[aria-invalid=true]{border-color:var(--erro);border-width:2px}
   background:var(--ink);color:var(--bg);font-size:15px;font-weight:600;padding:10px 16px;border-radius:10px;box-shadow:0 6px 20px rgb(0 0 0/.25);
   opacity:0;transform:translate(-50%,8px);pointer-events:none}
 .toast.on{opacity:1;transform:translate(-50%,0)}
+.toast.acao{pointer-events:auto;display:flex;align-items:center;gap:12px;padding-block:6px}
+.toast button{font:700 15px var(--font);min-height:44px;padding:0 14px;border-radius:8px;border:0;background:var(--bg);color:var(--ink);cursor:pointer}
+.toast button:focus-visible{outline:2px solid var(--bg);outline-offset:2px}
 .toast.erro{background:var(--erro);color:light-dark(#fff,#1d1b17)}
 @media(prefers-reduced-motion:no-preference){.toast{transition:opacity .2s cubic-bezier(.2,.8,.2,1),transform .2s cubic-bezier(.2,.8,.2,1)}}
 .warn{background:var(--maybe);color:var(--maybeink);border-radius:8px;padding:12px 14px;margin-bottom:16px;font-size:15px}
