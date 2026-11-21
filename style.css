@@ -72,6 +72,18 @@ input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid 
 .warn{background:var(--maybe);color:var(--maybeink);border-radius:8px;padding:12px 14px;margin-bottom:16px;font-size:15px}
 .more{margin-top:24px;font:600 15px var(--font);min-height:44px;padding:0 18px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
 
-@media(min-width:600px){.days{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}.pick{grid-template-columns:minmax(0,1fr)}}
-@media(min-width:900px){.days{grid-template-columns:repeat(7,minmax(0,1fr))}.only-we .days{grid-template-columns:repeat(3,minmax(0,1fr))}.day{padding:10px}}
+/* Até 899px: uma linha por dia (dia à esquerda, botões à direita, nomes por baixo só se houver) */
+@media(max-width:899px){
+  .day{display:grid;grid-template-columns:84px minmax(0,1fr);grid-template-areas:"name pick" "bar pick" "who who";gap:6px 12px;align-items:center;padding:8px 12px}
+  .day.past{grid-template-areas:"name who" "bar who"}
+  .dname{grid-area:name;flex-direction:column;gap:0}
+  .bar{grid-area:bar}
+  .pick{grid-area:pick}
+  .who{grid-area:who;min-height:0}
+  .who:not(:has(.chip)){display:none}
+  .day.past .who:not(:has(.chip)){display:block;color:var(--mute);font-size:14px}
+}
+@media(max-width:399px){.pick button{font-size:13px;padding:2px}}
+/* 900px ou mais: a semana como um horário de 7 colunas */
+@media(min-width:900px){.days{grid-template-columns:repeat(7,minmax(0,1fr))}.only-we .days{grid-template-columns:repeat(3,minmax(0,1fr))}.day{padding:10px}.pick{grid-template-columns:minmax(0,1fr)}.only-we .pick{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(prefers-reduced-motion:no-preference){.bar i{transition:width .3s ease}}
