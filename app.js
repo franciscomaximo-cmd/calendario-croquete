@@ -39,12 +39,12 @@ function render(){
   $('#weeks').classList.toggle('only-we', soFds);
   $('#weeks').innerHTML = mondays(weeksShown).map((seg,wi) => {
     const dom = new Date(seg); dom.setDate(seg.getDate()+6);
-    const passados = [];
+    const passados = []; let porMarcar = 0, marcados = 0;
     const days = DIAS.map((name,off) => {
       if (soFds && off < 4) return '';
       const d = new Date(seg); d.setDate(seg.getDate()+off); const k = iso(d);
       const past = k < hoje;
-      if (past) passados.push(name);
+      if (past) passados.push(name); else { porMarcar++; if (mine()[k]) marcados++ }
       const ans = ids.map(id => ({id, v: disp[id][k]})).filter(a => a.v)
                      .sort((a,b) => 'ymn'.indexOf(a.v)-'ymn'.indexOf(b.v) || nameOf(a.id).localeCompare(nameOf(b.id)));
       const y = ans.filter(a => a.v==='y').length, m = ans.filter(a => a.v==='m').length;
@@ -62,7 +62,8 @@ function render(){
     const range = wi < 2 ? `${fmt(seg)} – ${fmt(dom)}` : `até ${fmt(dom)}`;
     // no telemóvel os dias passados ficam numa só linha (o CSS esconde os .day.past)
     const pastline = passados.length ? `<p class="pastline">${passados.length===1 ? passados[0]+' já passou.' : passados[0]+' a '+passados.at(-1).toLowerCase()+' já passaram.'}</p>` : '';
-    return `<article class="wk"><header><h2>${title}</h2><small>${range}</small></header><div class="days">${pastline}${days}</div></article>`;
+    const feito = !porMarcar ? '' : marcados === porMarcar ? ' · <b class="feito">marcaste tudo</b>' : ` · marcaste ${marcados} de ${porMarcar}`;
+    return `<article class="wk"><header><h2>${title}</h2><small>${range}${feito}</small></header><div class="days">${pastline}${days}</div></article>`;
   }).join('');
 
   // Mais livres primeiro, depois mais "talvez", depois o mais cedo
