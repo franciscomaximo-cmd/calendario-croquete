@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Quando nos juntamos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="band"><div class="wrap">
+  <h1>Quando é que nos juntamos?</h1>
+  <p class="lead">Marca, para cada dia da semana, se estás livre, talvez ou ocupado. Todos veem as respostas de todos e o dia com mais gente aparece em destaque.</p>
+  <div id="warn"></div>
+  <div class="me">
+    <label for="nick">O teu nome</label>
+    <input type="text" id="nick" maxlength="24" placeholder="ex.: Francisco" autocomplete="nickname">
+    <span class="alt">
+      <label for="claim">Já marcaste noutro dispositivo?</label>
+      <select id="claim"><option value="">Escolhe o teu nome</option></select>
+    </span>
+  </div>
+  <div class="legend">
+    <span><i class="dot" style="background:var(--yes)"></i>Livre</span>
+    <span><i class="dot" style="background:var(--maybe)"></i>Talvez</span>
+    <span><i class="dot" style="background:var(--no)"></i>Ocupado</span>
+    <label class="vista">Mostrar
+      <select id="vista"><option value="all">Semana toda</option><option value="fds">Só fins de semana</option></select>
+    </label>
+  </div>
+  <div id="best" class="best empty"><div class="big">—</div><div class="t">A carregar…</div><div class="s"></div></div>
+  <section class="weeks" id="weeks" aria-label="Semanas"></section>
+  <button class="more" id="more" type="button">Mostrar mais semanas</button>
+  <p class="status" id="status">A ligar…</p>
+</div></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

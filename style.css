@@ -1,0 +1,64 @@
+/* VOICE: descontraído, de amigos, claro como uma folha de turnos bem feita
+   IDEA: o calendário de cortiça da sala de estudo, onde cada um põe o seu pino
+   PICTURE: a grelha de semanas em si, com pinos por pessoa e o "melhor dia" em destaque
+   COLOUR and TYPE: branco, tinta azul-noite, cobalto (livre), girassol (talvez); Outfit + Inter
+   LAYOUT: título curto, destaque do melhor dia, depois cartões de fim de semana em coluna */
+:root{color-scheme:light dark;
+--bg:light-dark(#ffffff,#0f1424);--card:light-dark(#f4f5fa,#182038);--line:light-dark(#e2e5ef,#2a3354);
+--ink:light-dark(#121a2b,#eef1fb);--mute:light-dark(#5b6479,#a3abc4);
+--yes:#2b47e0;--yesink:#fff;--maybe:#ffc83d;--maybeink:#2a2100;--no:light-dark(#d6d9e3,#3a4262);--noink:light-dark(#4a5268,#c8cee0);--we:light-dark(#fbf7ec,#1b2440)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif;overflow-x:clip}
+.band{padding:clamp(24px,4vw,56px) max(5vw,16px)}
+.wrap{max-width:1000px;margin:0 auto}
+h1{font:800 clamp(32px,5vw,48px)/1.05 Outfit,sans-serif;margin:0 0 8px;text-wrap:balance}
+h2{font:700 22px/1.2 Outfit,sans-serif;margin:0}
+.lead{color:var(--mute);margin:0 0 20px;max-width:60ch}
+.me{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:18px}
+.me label{font-weight:600}
+input[type=text]{font:16px Inter,sans-serif;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);min-height:44px;width:min(260px,100%)}
+input:focus-visible,button:focus-visible{outline:3px solid var(--yes);outline-offset:2px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:14px;color:var(--mute)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.dot{width:14px;height:14px;border-radius:50%;display:inline-block}
+.best{background:var(--yes);color:#fff;border-radius:18px;padding:20px 22px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 18px;align-items:center;margin:20px 0 8px}
+.best .big{font:800 clamp(40px,7vw,60px)/1 Outfit,sans-serif;grid-row:span 2}
+.best .t{font:700 20px/1.2 Outfit,sans-serif}
+.best .s{opacity:.85;font-size:15px}
+.best.empty{background:var(--card);color:var(--ink)}
+.weeks{display:grid;gap:16px}
+.wk{background:var(--card);border-radius:18px;padding:18px}
+.wk header{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.wk header small{color:var(--mute);font-size:14px}
+.days{display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
+.day{background:var(--bg);border:1.5px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:10px}
+.day.we{background:var(--we)}
+.day.past{opacity:.45}
+.day.top{border-color:var(--yes);box-shadow:0 0 0 2px var(--yes) inset}
+.dname{font:700 16px Outfit,sans-serif;display:flex;flex-wrap:wrap;justify-content:space-between;gap:0 6px}
+.dname .n{color:var(--mute);font:500 14px Inter,sans-serif;white-space:nowrap}
+.bar{height:8px;border-radius:4px;background:var(--no);overflow:hidden;display:flex}
+.bar i{display:block;height:100%}
+.pick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+.pick button{font:600 13px Inter,sans-serif;min-height:44px;border-radius:10px;border:1.5px solid var(--line);background:transparent;color:var(--ink);cursor:pointer;padding:4px}
+.pick button[aria-pressed=true].y{background:var(--yes);border-color:var(--yes);color:var(--yesink)}
+.pick button[aria-pressed=true].m{background:var(--maybe);border-color:var(--maybe);color:var(--maybeink)}
+.pick button[aria-pressed=true].n{background:var(--no);border-color:var(--no);color:var(--noink)}
+.who{display:flex;flex-wrap:wrap;gap:4px;min-height:24px}
+.chip{font-size:13px;padding:2px 9px;border-radius:999px;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.chip.y{background:var(--yes);color:var(--yesink)}.chip.m{background:var(--maybe);color:var(--maybeink)}.chip.n{background:var(--no);color:var(--noink);text-decoration:line-through}
+.status{font-size:14px;color:var(--mute);margin-top:18px}
+.warn{background:var(--maybe);color:var(--maybeink);border-radius:12px;padding:12px 14px;margin-bottom:16px;font-size:15px}
+.more{margin-top:16px;font:600 15px Inter,sans-serif;min-height:44px;padding:0 18px;border-radius:12px;border:1.5px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
+.best .top3{grid-column:1/-1;margin-top:10px;font-size:14px}
+.best .top3 ol{margin:4px 0 0;padding-left:20px}
+.legend .vista{display:inline-flex;align-items:center;gap:8px;margin-left:auto}
+/* < 600px: um dia por linha, botões lado a lado (regras base acima) */
+@media(max-width:599px){.best{grid-template-columns:minmax(0,1fr)}.best .big{grid-row:auto}.legend .vista{margin-left:0}}
+/* ≥ 600px: dias em grelha, botões empilhados (3 lado a lado não cabem em ~140px) */
+@media(min-width:600px){.days{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}.pick{grid-template-columns:minmax(0,1fr)}}
+@media(min-width:900px){.days{grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}.only-we .days{grid-template-columns:repeat(3,minmax(0,1fr))}.day{padding:10px}}
+@media(prefers-reduced-motion:no-preference){.bar i{transition:width .3s ease}}
+select{font:16px Inter,sans-serif;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);min-height:44px;max-width:100%}
+.me .alt{font-size:14px;color:var(--mute);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
