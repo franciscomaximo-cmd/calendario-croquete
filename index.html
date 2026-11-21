@@ -16,21 +16,14 @@
   <div id="warn"></div>
   <div class="me">
     <label class="campo">O teu nome
-      <input type="text" id="nick" maxlength="24" placeholder="ex.: Francisco" autocomplete="nickname" aria-describedby="nickdica">
+      <input type="text" id="nick" maxlength="24" placeholder="O teu nome" autocomplete="nickname" aria-describedby="nickdica">
       <span class="dica-erro" id="nickdica" hidden>Escreve primeiro o teu nome, para os outros saberem quem marcou.</span>
     </label>
-    <label class="campo alt">Já marcaste noutro dispositivo?
-      <select id="claim"><option value="">Escolhe o teu nome</option></select>
-    </label>
-    <label class="campo vista">Mostrar
-      <select id="vista"><option value="all">Semana toda</option><option value="fds">Só fins de semana</option></select>
-    </label>
-  </div>
-  <div class="legend">
-    <span><i class="dot y"></i>Livre</span>
-    <span><i class="dot m"></i>Talvez</span>
-    <span><i class="dot n"></i>Ocupado</span>
-    <span class="dica">Toca outra vez para desmarcar.</span>
+    <select id="vista" aria-label="Mostrar"><option value="all">Semana toda</option><option value="fds">Só fins de semana</option></select>
+    <details class="alt">
+      <summary>Já marcaste noutro dispositivo?</summary>
+      <select id="claim" aria-label="Escolhe o teu nome"><option value="">Escolhe o teu nome</option></select>
+    </details>
   </div>
   <div id="best" class="best empty"><h2 class="t">A carregar…</h2></div>
   <section class="weeks" id="weeks" aria-label="Semanas"></section>

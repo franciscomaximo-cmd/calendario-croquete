@@ -22,16 +22,15 @@ h1{font:800 clamp(24px,4.4vw,36px)/1.1 var(--font);letter-spacing:-.02em;margin:
 h2{font:700 18px/1.2 var(--font);margin:0}
 
 /* Nome e filtros */
-.me{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:end;margin-bottom:14px}
-.campo{display:grid;gap:4px;font-size:14px;font-weight:600}
-.campo.alt{color:var(--mute);font-weight:500}
+.me{display:flex;flex-wrap:wrap;gap:10px 12px;align-items:end}
+.campo{display:grid;gap:4px;font-size:14px;font-weight:600;flex:1 1 150px;max-width:260px}
+.alt{flex-basis:100%;font-size:14px;color:var(--mute)}
+.alt summary{cursor:pointer;width:max-content;max-width:100%;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--edge)}
+.alt summary:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.alt select{margin-top:8px}
 input[type=text],select{font:16px var(--font);padding:9px 12px;border:1px solid var(--edge);border-radius:8px;background:var(--bg);color:var(--ink);min-height:44px;max-width:100%}
-input[type=text]{width:min(240px,100%)}
+input[type=text]{width:100%}
 input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
-.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:14px;color:var(--mute)}
-.legend span{display:inline-flex;align-items:center;gap:6px}
-.dot{width:12px;height:12px;border-radius:3px;display:inline-block}
-.dot.y{background:var(--yes)}.dot.m{background:var(--maybe)}.dot.n{background:var(--no)}
 
 /* Melhor dia: a data é o herói */
 .best{margin:20px 0 28px;padding:18px 0;border-block:1px solid var(--line)}
@@ -78,7 +77,7 @@ input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid 
 .chip.y{background:var(--yes);color:var(--yesink)}.chip.m{background:var(--maybe);color:var(--maybeink)}.chip.n{background:var(--no);color:var(--noink);text-decoration:line-through}
 
 .status{font-size:14px;color:var(--mute);margin-top:18px}
-.dica{color:var(--mute)}
+.pastline{display:none;background:var(--bg);color:var(--mute);font-size:14px;padding:8px 12px;margin:0}
 .dica-erro{font-size:14px;font-weight:600;color:var(--erro);max-width:32ch}
 input[aria-invalid=true]{border-color:var(--erro);border-width:2px}
 .toast{position:fixed;left:50%;bottom:max(16px,env(safe-area-inset-bottom));z-index:10;max-width:calc(100% - 32px);width:max-content;
@@ -93,13 +92,13 @@ input[aria-invalid=true]{border-color:var(--erro);border-width:2px}
 /* Até 899px: uma linha por dia (dia à esquerda, botões à direita, nomes por baixo só se houver) */
 @media(max-width:899px){
   .day{display:grid;grid-template-columns:84px minmax(0,1fr);grid-template-areas:"name pick" "bar pick" "who who";gap:6px 12px;align-items:center;padding:8px 12px}
-  .day.past{grid-template-areas:"name who" "bar who"}
   .dname{grid-area:name}
   .bar{grid-area:bar}
   .pick{grid-area:pick}
   .who{grid-area:who;min-height:0}
   .who:not(:has(.chip)){display:none}
-  .day.past .who:not(:has(.chip)){display:block;color:var(--mute);font-size:14px}
+  .day.past{display:none}
+  .pastline{display:block}
 }
 @media(max-width:399px){.pick button{font-size:13px;padding:2px}}
 /* 900px ou mais: a semana como um horário de 7 colunas */

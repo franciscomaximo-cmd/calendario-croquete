@@ -31,7 +31,8 @@ Fonte do sistema (`--font`), sem fontes externas. Papéis: título do grupo 24�
 ## Componentes
 
 - **Semana:** título + intervalo; dias numa grelha com linhas de 1px (`gap:1px` sobre `--line`), raio 10px, sem sombra.
-- **Dia:** até 899px uma linha (dia/data à esquerda, três botões à direita, nomes por baixo só se houver); a partir de 900px 7 colunas (3 em "só fins de semana") com botões empilhados.
+- **Topo do formulário:** nome + filtro na mesma linha; "Já marcaste noutro dispositivo?" fica num `<details>` discreto. Sem legenda: os botões já dizem o estado.
+- **Dia:** até 899px uma linha (dia/data à esquerda, três botões à direita, nomes por baixo só se houver) e os dias passados juntos numa linha ("Segunda a sexta já passaram."); a partir de 900px 7 colunas (3 em "só fins de semana") com botões empilhados.
 - **Botões de estado:** 44px de altura, contorno `--edge`; escolhido = cor do estado + ✓ em SVG.
 - **Nomes:** etiqueta com a cor do estado; Talvez leva "?" e Ocupado é riscado (não depende só da cor).
 - **Melhor dia:** frase "Melhor dia: <data>" com a data em ligação para o dia; Top 3 por baixo.
