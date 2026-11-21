@@ -16,7 +16,8 @@
   <div id="warn"></div>
   <div class="me">
     <label class="campo">O teu nome
-      <input type="text" id="nick" maxlength="24" placeholder="ex.: Francisco" autocomplete="nickname">
+      <input type="text" id="nick" maxlength="24" placeholder="ex.: Francisco" autocomplete="nickname" aria-describedby="nickdica">
+      <span class="dica-erro" id="nickdica" hidden>Escreve primeiro o teu nome, para os outros saberem quem marcou.</span>
     </label>
     <label class="campo alt">Já marcaste noutro dispositivo?
       <select id="claim"><option value="">Escolhe o teu nome</option></select>
@@ -29,12 +30,14 @@
     <span><i class="dot y"></i>Livre</span>
     <span><i class="dot m"></i>Talvez</span>
     <span><i class="dot n"></i>Ocupado</span>
+    <span class="dica">Toca outra vez para desmarcar.</span>
   </div>
   <div id="best" class="best empty" aria-live="polite"><h2 class="t">A carregar…</h2></div>
   <section class="weeks" id="weeks" aria-label="Semanas"></section>
-  <button class="more" id="more" type="button">Mais semanas</button>
+  <button class="more" id="more" type="button">Mostrar mais 4 semanas</button>
   <p class="status" id="status">A ligar…</p>
 </div></main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script src="config.js"></script>
 <script src="app.js"></script>

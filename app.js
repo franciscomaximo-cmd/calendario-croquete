@@ -88,23 +88,45 @@ function render(){
 
 function status(t){ $('#status').textContent = t }
 
+// Aviso curto em baixo do ecrã, perto de onde se toca
+let toastTimer = null;
+function toast(t, erro){
+  const el = $('#toast');
+  el.textContent = t; el.classList.toggle('erro', !!erro); el.classList.add('on');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('on'), erro ? 6000 : 2200);
+}
+function erroPt(acao, e){
+  console.error(acao, e);
+  const m = String((e && e.message) || e);
+  if (/fetch|network|Failed/i.test(m)) return `Sem ligação: não deu para ${acao}. Tenta outra vez.`;
+  if (e && (e.code === '42501' || e.code === 'PGRST301')) return `Sem permissão para ${acao}.`;
+  return `Não deu para ${acao}. Tenta outra vez.`;
+}
+function pedirNome(){
+  const n = $('#nick');
+  $('#nickdica').hidden = false;
+  n.setAttribute('aria-invalid', 'true');
+  n.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  n.focus({ preventScroll: true });
+}
+
 // ---- Escritas ----
 let pessoaGuardada = false;
 async function ensurePessoa(){
   if (pessoaGuardada) return true;
   const nome = $('#nick').value.trim();
   const { error } = await sb.from('pessoas').upsert({ id: myId, nome });
-  if (error) { status('Não consegui guardar: '+error.message); return false }
+  if (error) { toast(erroPt('guardar o teu nome', error), true); return false }
   pessoas[myId] = nome; pessoaGuardada = true; return true;
 }
 
 async function setDia(k, v){
+  if (!$('#nick').value.trim()) { pedirNome(); return }   // sem nome, os outros não sabem quem marcou
   const antes = mine()[k];
   if (antes === v) delete mine()[k]; else mine()[k] = v;
   render();
   if (!sb) return;
-  if (!$('#nick').value.trim()) status('Escreve o teu nome em cima para os outros saberem quem és.');
-  if (!(await ensurePessoa())) return;
+  if (!(await ensurePessoa())) { if (antes) mine()[k] = antes; else delete mine()[k]; render(); return }
   const novo = mine()[k];
   const gravar = () => novo
     ? sb.from('disponibilidade').upsert({ pessoa_id: myId, dia: k, estado: novo, atualizado_em: new Date().toISOString() })
@@ -116,21 +138,22 @@ async function setDia(k, v){
   }
   if (error) { // repõe se falhou
     if (antes) mine()[k] = antes; else delete mine()[k];
-    render(); status('Não consegui guardar: '+error.message);
-  } else status('Guardado.');
+    render(); toast(erroPt('guardar', error), true);
+  } else toast(mine()[k] ? 'Guardado.' : 'Marcação removida.');
 }
 
 let nickTimer = null;
 $('#nick').addEventListener('input', e => {
   const nome = e.target.value.slice(0,24);
   store.set('fds_nome', nome);
+  if (nome.trim()) { $('#nickdica').hidden = true; e.target.removeAttribute('aria-invalid') }
   pessoas[myId] = nome.trim(); render();
   clearTimeout(nickTimer);
   nickTimer = setTimeout(async () => {
     if (!sb) return;
     const { error } = await sb.from('pessoas').upsert({ id: myId, nome: nome.trim() });
-    if (error) status('Não consegui guardar o nome: '+error.message);
-    else { pessoaGuardada = true; status('Nome guardado.') }
+    if (error) toast(erroPt('guardar o teu nome', error), true);
+    else { pessoaGuardada = true; toast('Nome guardado.') }
   }, 600);
 });
 
@@ -138,7 +161,8 @@ $('#claim').addEventListener('change', e => {
   const id = e.target.value; if (!id) return;
   myId = id; store.set('fds_id', id); pessoaGuardada = true;
   $('#nick').value = pessoas[id] || ''; store.set('fds_nome', $('#nick').value);
-  e.target.value = ''; render(); status('Agora estás a editar como '+nameOf(id)+'.');
+  $('#nickdica').hidden = true; $('#nick').removeAttribute('aria-invalid');
+  e.target.value = ''; render(); toast('Agora estás a marcar como '+nameOf(id)+'.');
 });
 
 document.addEventListener('click', e => {
