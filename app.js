@@ -53,7 +53,7 @@ function render(){
       return `<div class="day${off>=5 ? ' we' : ''}${past ? ' past' : ''}" data-k="${k}" id="d-${k}">
         <div class="dname">${name}<span class="n">${fmt(d)}</span></div>
         <div class="bar" role="img" aria-label="${y} ${y===1 ? 'livre' : 'livres'}, ${m} talvez, de ${grupo}"><i class="m" style="--v:${(y+m)/grupo}"></i><i class="y" style="--v:${y/grupo}"></i></div>
-        <div class="who">${ans.map(a => `<span class="chip ${a.v}" title="${LABEL[a.v]}">${esc(nameOf(a.id))}${a.v==='m' ? '<span aria-hidden="true">?</span>' : ''}<span class="vh"> (${LABEL[a.v].toLowerCase()})</span></span>`).join('') || '<span class="none">Sem respostas</span>'}</div>
+        <div class="who">${ans.map(a => `<span class="chip ${a.v}" title="${LABEL[a.v]}">${esc(nameOf(a.id))}${a.v==='m' ? '<span aria-hidden="true">?</span>' : ''}<span class="vh"> (${LABEL[a.v].toLowerCase()})</span></span>`).join('')}</div>
         ${past ? '' : `<div class="pick" role="group" aria-label="A tua disponibilidade, ${name} ${fmt(d)}">
           ${['y','m','n'].map(v => `<button type="button" class="${v}" data-k="${k}" data-v="${v}" aria-pressed="${my===v}"><svg class="ok" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg>${LABEL[v]}</button>`).join('')}
         </div>`}</div>`;

@@ -30,6 +30,7 @@ h2{font:700 18px/1.2 var(--font);margin:0}
 .alt select{margin-top:8px}
 input[type=text],select{font:16px var(--font);padding:9px 12px;border:1px solid var(--edge);border-radius:8px;background:var(--bg);color:var(--ink);min-height:44px;max-width:100%}
 input[type=text]{width:100%}
+::placeholder{color:var(--mute);opacity:1}
 input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 
 /* Melhor dia: a data é o herói */
@@ -56,7 +57,7 @@ input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid 
 .day.past{color:var(--mute)}
 .day.past .dname{font-weight:600}
 .day.past .bar{visibility:hidden}
-.none{color:var(--mute);font-size:14px}
+.day.past .who{visibility:hidden}   /* quem pôde num dia que já passou não ajuda a decidir */
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 .day.top{background:var(--best)}
 .dname{font:700 16px/1.2 var(--font);display:flex;flex-direction:column}
