@@ -79,7 +79,7 @@ input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid 
 
 .status{font-size:14px;color:var(--mute);margin-top:18px}
 .pastline{display:none;background:var(--bg);color:var(--mute);font-size:14px;padding:8px 12px;margin:0}
-.dica-erro{font-size:14px;font-weight:600;color:var(--erro);max-width:32ch}
+.dica-erro{flex-basis:100%;margin:0;font-size:14px;font-weight:600;color:var(--erro);max-width:60ch}
 input[aria-invalid=true]{border-color:var(--erro);border-width:2px}
 .toast{position:fixed;left:50%;bottom:max(16px,env(safe-area-inset-bottom));z-index:10;max-width:calc(100% - 32px);width:max-content;
   background:var(--ink);color:var(--bg);font-size:15px;font-weight:600;padding:10px 16px;border-radius:10px;box-shadow:0 6px 20px rgb(0 0 0/.25);

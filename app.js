@@ -113,8 +113,13 @@ function erroPt(acao, e){
   if (e && (e.code === '42501' || e.code === 'PGRST301')) return `Sem permissão para ${acao}.`;
   return `Não deu para ${acao}. Tenta outra vez.`;
 }
-function pedirNome(){
+// Toque feito sem nome: fica guardado e aplica-se quando o nome estiver escrito
+let pendente = null;
+function pedirNome(k, v){
   const n = $('#nick');
+  pendente = { k, v };
+  const dn = document.getElementById('d-'+k).querySelector('.dname');
+  $('#nickdica').textContent = `Escreve o teu nome: o teu "${LABEL[v]}" de ${dn.firstChild.textContent.toLowerCase()}, ${dn.querySelector('.n').textContent} fica marcado a seguir.`;
   $('#nickdica').hidden = false;
   n.setAttribute('aria-invalid', 'true');
   n.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
@@ -132,7 +137,7 @@ async function ensurePessoa(){
 }
 
 async function setDia(k, v){
-  if (!$('#nick').value.trim()) { pedirNome(); return }   // sem nome, os outros não sabem quem marcou
+  if (!$('#nick').value.trim()) { pedirNome(k, v); return }   // sem nome, os outros não sabem quem marcou
   const antes = mine()[k];
   if (antes === v) delete mine()[k]; else mine()[k] = v;
   render();
@@ -164,9 +169,18 @@ $('#nick').addEventListener('input', e => {
     if (!sb) return;
     const { error } = await sb.from('pessoas').upsert({ id: myId, nome: nome.trim() });
     if (error) toast(erroPt('guardar o teu nome', error), true);
-    else { pessoaGuardada = true; toast('Nome guardado.') }
+    else { pessoaGuardada = true; if (!pendente) toast('Nome guardado.') }
   }, 600);
 });
+function aplicarPendente(){
+  if (!pendente || !$('#nick').value.trim()) return;
+  const { k, v } = pendente; pendente = null;
+  clearTimeout(nickTimer); pessoaGuardada = false;   // o setDia grava o nome e a marcação de uma vez
+  if (mine()[k] !== v) setDia(k, v);   // setDia alterna: não desmarcar se já estava assim
+  const reduz = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.getElementById('d-'+k).scrollIntoView({ block: 'center', behavior: reduz ? 'auto' : 'smooth' });
+}
+$('#nick').addEventListener('change', aplicarPendente);   // Enter ou sair do campo
 
 function serComo(id, nome){
   myId = id; store.set('fds_id', id); pessoaGuardada = pessoas[id] !== undefined;
