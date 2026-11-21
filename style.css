@@ -113,6 +113,8 @@ input[aria-invalid=true]{border-color:var(--erro);border-width:2px}
 .btn:disabled{opacity:.6;cursor:progress}
 .pw{margin:8px 0 32px;padding-top:20px;border-top:1px solid var(--line);max-width:360px}
 .regra{margin:-6px 0 0;font-size:14px;color:var(--mute)}
+.aviso-ok{margin:0;font-size:15px;font-weight:600;max-width:40ch}
+.login .linkbtn{justify-self:start}
 .barra{display:flex;justify-content:space-between;align-items:center;gap:8px 16px;flex-wrap:wrap;margin-bottom:20px}
 .barra .status{margin:0}
 .pessoas{list-style:none;margin:12px 0 20px;padding:0;display:grid;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}

@@ -25,9 +25,11 @@ function erroPt(acao, e){
   return `Não deu para ${acao}: ${m}`;
 }
 
-function mostrarLogin(){ $('#login').hidden = false; $('#painel').hidden = true; status(''); $('#email').focus() }
+// Um ecrã de cada vez: login, esqueci-me, nova password (vinda do email) ou painel
+function ecra(id){ ['#login', '#esquecif', '#recuperar', '#painel'].forEach(s => $(s).hidden = s !== id) }
+function mostrarLogin(){ ecra('#login'); status(''); $('#email').focus() }
 async function mostrarPainel(sessao){
-  $('#login').hidden = true; $('#painel').hidden = false;
+  ecra('#painel');
   $('#quem').textContent = 'Entraste como '+sessao.user.email+'.';
   const { data: admin, error } = await sb.rpc('is_admin');
   if (error) return status('Falta correr o admin.sql no Supabase ('+error.message+').', true);
@@ -147,6 +149,56 @@ $('#mudarpw').addEventListener('submit', e => {
   });
 });
 
+// ---- Esqueci-me da password ----
+const REDIRECT = 'https://calendario-croquete.onrender.com/admin.html';
+const LINK_INVALIDO = 'Esta ligação já não é válida. Pede outra em «Esqueci-me da password».';
+// lido já, antes de o cliente do Supabase tratar (e limpar) o endereço
+const hashInicial = location.hash;
+// sessionStorage: se a página for recarregada antes de gravar (o Supabase já limpou o endereço), continua a pedir a password nova
+const marcaRec = { get(){ try { return sessionStorage.getItem('croquete-rec') === '1' } catch(e){ return false } },
+                   set(on){ try { on ? sessionStorage.setItem('croquete-rec', '1') : sessionStorage.removeItem('croquete-rec') } catch(e){} } };
+let emRecuperacao = /type=recovery/.test(hashInicial) || marcaRec.get();
+const linkComErro = /error_code=|error_description=/.test(hashInicial);
+const limparUrl = () => history.replaceState(null, '', location.pathname + location.search);
+
+$('#esqueci').addEventListener('click', () => {
+  $('#emailrec').value = $('#email').value.trim();
+  erroEm('#recerro', ''); $('#recmsg').hidden = true;
+  ecra('#esquecif'); $('#emailrec').focus();
+});
+$('#voltar').addEventListener('click', mostrarLogin);
+$('#esquecif').addEventListener('submit', e => {
+  e.preventDefault();
+  const email = $('#emailrec').value.trim();
+  erroEm('#recerro', ''); $('#recmsg').hidden = true;
+  if (!email) return erroEm('#recerro', 'Escreve o teu email.');
+  aGravar(e.target, async () => {
+    const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: REDIRECT });
+    const m = String((error && error.message) || '');
+    // a mesma resposta exista ou não a conta; só falta de rede e excesso de pedidos têm mensagem própria (não revelam nada)
+    if (error && /fetch|network|Failed/i.test(m)) return erroEm('#recerro', 'Sem ligação: tenta outra vez.');
+    if (error && (error.status === 429 || /rate limit/i.test(m))) return erroEm('#recerro', 'Pediste muitas vezes. Espera uns minutos.');
+    $('#recmsg').textContent = 'Se o email estiver registado, vais receber uma ligação.'; $('#recmsg').hidden = false;
+  });
+});
+
+function mostrarRecuperar(){ emRecuperacao = true; marcaRec.set(true); ecra('#recuperar'); status(''); $('#recnova').focus() }
+$('#recuperar').addEventListener('submit', e => {
+  e.preventDefault();
+  erroEm('#recpwerro', '');
+  const invalida = validarNova($('#recnova').value, $('#recrep').value);
+  if (invalida) return erroEm('#recpwerro', invalida);
+  aGravar(e.target, async () => {
+    const { error } = await sb.auth.updateUser({ password: $('#recnova').value });
+    if (error && (error.status === 401 || error.status === 403)) { marcaRec.set(false); limparUrl(); mostrarLogin(); return erroEm('#loginerro', LINK_INVALIDO) }
+    if (error) return erroEm('#recpwerro', erroPw(error));
+    emRecuperacao = false; marcaRec.set(false); limparUrl(); e.target.reset();
+    toast('Password nova guardada.');
+    const { data: { session } } = await sb.auth.getSession();
+    session ? mostrarPainel(session) : mostrarLogin();
+  });
+});
+
 $('#login').addEventListener('submit', async e => {
   e.preventDefault();
   const erro = $('#loginerro'); erro.hidden = true;
@@ -162,6 +214,12 @@ if (!window.supabase || !window.SUPABASE_URL || window.SUPABASE_URL.includes('O-
 } else {
   // sessão guardada com outro nome: o calendário, no mesmo browser, tem de continuar a fazer pedidos anónimos
   sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY, { auth: { storageKey: 'croquete-admin' } });
-  sb.auth.getSession().then(({ data: { session } }) => session ? mostrarPainel(session) : mostrarLogin());
+  // vinda da ligação do email: o mesmo cliente (mesmo storageKey) lê o token do endereço e avisa com PASSWORD_RECOVERY
+  sb.auth.onAuthStateChange(ev => { if (ev === 'PASSWORD_RECOVERY') mostrarRecuperar() });
+  sb.auth.getSession().then(({ data: { session } }) => {
+    if (linkComErro || (emRecuperacao && !session)) { marcaRec.set(false); limparUrl(); mostrarLogin(); return erroEm('#loginerro', LINK_INVALIDO) }
+    if (emRecuperacao) return mostrarRecuperar();   // só a password nova; não pede a atual
+    session ? mostrarPainel(session) : mostrarLogin();
+  });
 }
 }

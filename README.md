@@ -36,7 +36,7 @@ Abre a pasta no VS Code, instala a extensão **Live Server** e faz clique direit
 
 ## 4. Admin (opcional)
 
-Para mudar nomes, juntar pessoas repetidas e apagar pessoas. Segue as instruções no topo de `admin.sql` (criar o teu utilizador, desligar registos, pôr o teu email) e corre-o no **SQL Editor**. Depois abre `/admin.html` e entra com o email e a password que criaste. A anon key do site continua sem poder apagar pessoas, e a página de admin usa só essa chave pública: o que o admin pode fazer decide-se no Supabase.
+Para mudar nomes, juntar pessoas repetidas e apagar pessoas. Segue as instruções no topo de `admin.sql` (criar o teu utilizador, desligar registos, pôr o teu email) e corre-o no **SQL Editor**. Depois abre `/admin.html` e entra com o email e a password que criaste. Lá dentro podes mudar a password; no login há "Esqueci-me da password", que manda uma ligação para `https://calendario-croquete.onrender.com/admin.html`. Para isso funcionar, em **Authentication → URL Configuration** o Site URL tem de ser `https://calendario-croquete.onrender.com` e esse endereço do `admin.html` tem de estar nas **Redirect URLs**. A anon key do site continua sem poder apagar pessoas, e a página de admin usa só essa chave pública: o que o admin pode fazer decide-se no Supabase.
 
 ## Notas
 

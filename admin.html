@@ -24,6 +24,29 @@
     </label>
     <p class="dica-erro" id="loginerro" role="alert" hidden></p>
     <button class="btn" type="submit">Entrar</button>
+    <button class="linkbtn" id="esqueci" type="button">Esqueci-me da password</button>
+  </form>
+  <form class="login" id="esquecif" novalidate hidden>
+    <h2>Esqueci-me da password</h2>
+    <label class="campo">Email
+      <input type="email" id="emailrec" autocomplete="username">
+    </label>
+    <p class="aviso-ok" id="recmsg" role="status" hidden></p>
+    <p class="dica-erro" id="recerro" role="alert" hidden></p>
+    <button class="btn" type="submit">Enviar ligação</button>
+    <button class="linkbtn" id="voltar" type="button">Voltar ao login</button>
+  </form>
+  <form class="login" id="recuperar" novalidate hidden>
+    <h2>Nova password</h2>
+    <label class="campo">Nova password
+      <input type="password" id="recnova" autocomplete="new-password" aria-describedby="recregra">
+    </label>
+    <p class="regra" id="recregra">Pelo menos 8 caracteres.</p>
+    <label class="campo">Repetir nova password
+      <input type="password" id="recrep" autocomplete="new-password">
+    </label>
+    <p class="dica-erro" id="recpwerro" role="alert" hidden></p>
+    <button class="btn" type="submit">Guardar password</button>
   </form>
   <section id="painel" hidden>
     <div class="barra">
