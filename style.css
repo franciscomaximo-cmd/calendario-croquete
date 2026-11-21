@@ -39,9 +39,9 @@ input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid 
 .best .t a{color:inherit;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:6px;text-decoration-color:var(--maybe)}
 .best.empty .t{font-size:22px}
 .best .s{color:var(--mute);font-size:16px;margin:6px 0 0}
-.best .top3{margin-top:14px;font-size:15px}
-.best .top3 b{font-size:14px;font-weight:600;color:var(--mute)}
-.best .top3 ol{margin:4px 0 0;padding-left:22px}
+.best .s .nomes{color:var(--ink);font-weight:600}
+.best .top3{margin:12px 0 0;font-size:15px}
+.best .top3 b{font-weight:600;color:var(--mute)}
 .best .top3 a{color:inherit;text-underline-offset:3px;font-weight:600}
 .day{scroll-margin-top:16px}
 

@@ -48,7 +48,7 @@ function render(){
       const ans = ids.map(id => ({id, v: disp[id][k]})).filter(a => a.v)
                      .sort((a,b) => 'ymn'.indexOf(a.v)-'ymn'.indexOf(b.v) || nameOf(a.id).localeCompare(nameOf(b.id)));
       const y = ans.filter(a => a.v==='y').length, m = ans.filter(a => a.v==='m').length;
-      if (!past && y > 0) cands.push({y, m, k, name, d});
+      if (!past && y > 0) cands.push({y, m, k, name, d, ans});
       const my = mine()[k] || '';
       return `<div class="day${off>=5 ? ' we' : ''}${past ? ' past' : ''}" data-k="${k}" id="d-${k}">
         <div class="dname">${name}<span class="n">${fmt(d)}</span></div>
@@ -72,10 +72,11 @@ function render(){
   if (best) {
     b.className = 'best';
     const conta = c => `${c.y} ${c.y===1 ? 'livre' : 'livres'}${c.m ? ` e ${c.m} talvez` : ''}`;
+    const nomes = v => new Intl.ListFormat('pt-PT').format(best.ans.filter(a => a.v===v).map(a => esc(nameOf(a.id))));
     b.innerHTML = `<h2 class="t"><span class="lbl">Melhor dia:</span> <a href="#d-${best.k}">${best.name}, ${fmt(best.d)}</a></h2>
-      <p class="s">${conta(best)}, de ${grupo} ${grupo===1 ? 'pessoa' : 'pessoas'}.</p>
-      ${cands.length > 1 ? `<div class="top3"><b>Top 3</b><ol>${cands.slice(0,3).map(c =>
-        `<li><a href="#d-${c.k}">${c.name}, ${fmt(c.d)}</a> · ${conta(c)}</li>`).join('')}</ol></div>` : ''}`;
+      <p class="s"><span class="nomes">${nomes('y')}</span>${best.m ? ` · talvez ${nomes('m')}` : ''}</p>
+      ${cands.length > 1 ? `<p class="top3"><b>Também dá:</b> ${cands.slice(1,3).map(c =>
+        `<a href="#d-${c.k}">${c.name}, ${fmt(c.d)}</a> (${conta(c)})`).join(' · ')}</p>` : ''}`;
     const el = document.querySelector(`.day[data-k="${best.k}"]`); if (el) el.classList.add('top');
   } else {
     b.className = 'best empty';

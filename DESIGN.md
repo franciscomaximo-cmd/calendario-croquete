@@ -35,7 +35,7 @@ Fonte do sistema (`--font`), sem fontes externas. Papéis: título do grupo 24�
 - **Dia:** até 899px uma linha (dia/data à esquerda, três botões à direita, nomes por baixo só se houver) e os dias passados juntos numa linha ("Segunda a sexta já passaram."); a partir de 900px 7 colunas (3 em "só fins de semana") com botões empilhados.
 - **Botões de estado:** 44px de altura, contorno `--edge`; Livre leva texto e contorno `--yes` a 700 (é a resposta que mais interessa); escolhido = cor do estado + ✓ em SVG, e Ocupado escolhido leva ainda contorno de 2px em `--ink`. Abaixo de 380px sai o ✓; abaixo de 360px os botões passam para uma linha própria.
 - **Nomes:** etiqueta com a cor do estado; Talvez leva "?" e Ocupado é riscado (não depende só da cor).
-- **Melhor dia:** frase "Melhor dia: <data>" com a data em ligação para o dia; Top 3 por baixo.
+- **Melhor dia:** frase "Melhor dia: <data>" com a data em ligação para o dia; por baixo quem está livre ("Ana, Rui e Zé · talvez Marta") e "Também dá:" com os dois dias seguintes, sem repetir o vencedor.
 - **Aviso (toast):** fixo em baixo, tinta sobre fundo invertido; erro em `--erro`. Pode levar um botão de ação (44px, recebe o foco, 8s): escolher um nome em "Já marcaste noutro dispositivo?" pede "Sou eu" e depois oferece "Desfazer".
 
 ## Movimento

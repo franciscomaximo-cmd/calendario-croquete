@@ -29,7 +29,7 @@ Um calendário só do grupo, sem contas: cada um escreve o nome e marca Livre / 
 - Semanas de segunda a domingo: a atual e as seguintes (6 por omissão, "mais" acrescenta 4); filtro "Semana toda / Só fins de semana" (sexta a domingo).
 - Dias já passados da semana atual não se podem marcar.
 - Três estados por dia e por pessoa: Livre, Talvez, Ocupado; tocar outra vez no estado ativo remove a marcação.
-- Melhor dia e Top 3, só de hoje em diante.
+- Melhor dia (com os nomes de quem pode) e mais dois que também dão, só de hoje em diante.
 - Sem contas: identidade por id guardado no browser; "Já marcaste noutro dispositivo?" recupera um nome existente.
 - Supabase (tabelas `pessoas` e `disponibilidade`) com tempo real; HTML/CSS/JS estático sem build, publicado como site estático.
 
