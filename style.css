@@ -1,64 +1,94 @@
-/* VOICE: descontraído, de amigos, claro como uma folha de turnos bem feita
-   IDEA: o calendário de cortiça da sala de estudo, onde cada um põe o seu pino
-   PICTURE: a grelha de semanas em si, com pinos por pessoa e o "melhor dia" em destaque
-   COLOUR and TYPE: branco, tinta azul-noite, cobalto (livre), girassol (talvez); Outfit + Inter
-   LAYOUT: título curto, destaque do melhor dia, depois cartões de fim de semana em coluna */
+/* VOICE: brincalhão, de grupo de amigos, sem ar de "app"
+   IDEA: o balcão de um snack-bar: talão de pedido, pratinho de croquetes, palitos com bandeira
+   PICTURE: um prato com croquetes dourados e um palito-bandeira no topo; o resto é a grelha de dias
+   COLOUR and TYPE: mostarda #f4c430 (topo), crosta dourada #d9822b (livre), massa crua #f3ddb0 (talvez),
+                    queimado #3b2412 (tinta e ocupado); Lilita One + Figtree
+   LAYOUT: faixa mostarda com título e prato; talão do melhor dia; semanas como tabuleiros com sombra dura */
 :root{color-scheme:light dark;
---bg:light-dark(#ffffff,#0f1424);--card:light-dark(#f4f5fa,#182038);--line:light-dark(#e2e5ef,#2a3354);
---ink:light-dark(#121a2b,#eef1fb);--mute:light-dark(#5b6479,#a3abc4);
---yes:#2b47e0;--yesink:#fff;--maybe:#ffc83d;--maybeink:#2a2100;--no:light-dark(#d6d9e3,#3a4262);--noink:light-dark(#4a5268,#c8cee0);--we:light-dark(#fbf7ec,#1b2440)}
+--bg:light-dark(#fffaf0,#1c110a);--paper:light-dark(#ffffff,#2a1a0e);--ink:light-dark(#3b2412,#f6e7cc);
+--mute:light-dark(#7a5a3c,#c9ab85);--line:light-dark(#3b2412,#7a5530);--band:light-dark(#f4c430,#3a240f);
+--bandink:light-dark(#3b2412,#f6e7cc);
+--yes:#d9822b;--yesink:#2a1505;--maybe:#f3ddb0;--maybeink:#3b2412;--no:light-dark(#3b2412,#6e4524);--noink:#f3ddb0;
+--we:light-dark(#fff3d6,#33200f);--shadow:light-dark(#3b2412,#000)}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif;overflow-x:clip}
-.band{padding:clamp(24px,4vw,56px) max(5vw,16px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Figtree,system-ui,sans-serif;overflow-x:clip}
+
+/* Faixa de topo */
+.topo{background:var(--band);color:var(--bandink);border-bottom:3px solid var(--line);padding:clamp(24px,4vw,48px) max(5vw,16px) clamp(20px,3vw,36px)}
+.topo .in{max-width:1000px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,300px);gap:16px 32px;align-items:center}
+h1{font:400 clamp(36px,6vw,60px)/1 'Lilita One',sans-serif;margin:0 0 10px;text-wrap:balance;letter-spacing:.5px}
+.lead{margin:0;max-width:46ch;font-size:17px}
+.prato{width:100%;height:auto;display:block;max-height:200px}
+
+.band{padding:clamp(20px,3vw,40px) max(5vw,16px) clamp(32px,5vw,64px)}
 .wrap{max-width:1000px;margin:0 auto}
-h1{font:800 clamp(32px,5vw,48px)/1.05 Outfit,sans-serif;margin:0 0 8px;text-wrap:balance}
-h2{font:700 22px/1.2 Outfit,sans-serif;margin:0}
-.lead{color:var(--mute);margin:0 0 20px;max-width:60ch}
-.me{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:18px}
-.me label{font-weight:600}
-input[type=text]{font:16px Inter,sans-serif;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);min-height:44px;width:min(260px,100%)}
-input:focus-visible,button:focus-visible{outline:3px solid var(--yes);outline-offset:2px}
-.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:14px;color:var(--mute)}
+h2{font:400 24px/1.1 'Lilita One',sans-serif;margin:0;letter-spacing:.3px}
+
+/* Nome e filtros */
+.me{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin-bottom:16px}
+.me label{font-weight:700}
+input[type=text],select{font:16px Figtree,sans-serif;padding:10px 12px;border:2px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink);min-height:44px;max-width:100%}
+input[type=text]{width:min(260px,100%);box-shadow:3px 3px 0 var(--shadow)}
+input:focus-visible,button:focus-visible,select:focus-visible{outline:3px solid var(--yes);outline-offset:2px}
+.me .alt{font-size:14px;color:var(--mute);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.legend{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;font-size:14px;color:var(--mute)}
 .legend span{display:inline-flex;align-items:center;gap:6px}
-.dot{width:14px;height:14px;border-radius:50%;display:inline-block}
-.best{background:var(--yes);color:#fff;border-radius:18px;padding:20px 22px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 18px;align-items:center;margin:20px 0 8px}
-.best .big{font:800 clamp(40px,7vw,60px)/1 Outfit,sans-serif;grid-row:span 2}
-.best .t{font:700 20px/1.2 Outfit,sans-serif}
-.best .s{opacity:.85;font-size:15px}
-.best.empty{background:var(--card);color:var(--ink)}
-.weeks{display:grid;gap:16px}
-.wk{background:var(--card);border-radius:18px;padding:18px}
-.wk header{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:12px}
-.wk header small{color:var(--mute);font-size:14px}
+.legend b{color:var(--ink);font-weight:700}
+.dot{width:16px;height:16px;border-radius:4px;display:inline-block;border:2px solid var(--line)}
+.legend .vista{display:inline-flex;align-items:center;gap:8px;margin-left:auto;color:var(--ink);font-weight:600}
+
+/* Talão do melhor dia */
+.best{position:relative;background:var(--paper);color:var(--ink);border:2px solid var(--line);border-radius:4px;padding:20px 22px 22px;
+  display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 18px;align-items:center;margin:22px 0 26px;box-shadow:5px 5px 0 var(--shadow);
+  background-image:radial-gradient(circle at 10px 0,transparent 7px,var(--paper) 7.5px);background-size:20px 100%;background-position:0 -1px}
+.best::before{content:"Pedido do dia";position:absolute;top:-13px;left:16px;background:var(--yes);color:var(--yesink);font:400 14px/1 'Lilita One',sans-serif;padding:6px 10px;border:2px solid var(--line);border-radius:4px;transform:rotate(-2deg)}
+.best .big{font:400 clamp(44px,8vw,68px)/1 'Lilita One',sans-serif;grid-row:span 2;color:var(--yes);-webkit-text-stroke:2px var(--line);paint-order:stroke fill}
+.best .t{font:400 22px/1.15 'Lilita One',sans-serif}
+.best .s{color:var(--mute);font-size:15px}
+.best.empty .big{color:var(--maybe)}
+.best .top3{grid-column:1/-1;margin-top:12px;padding-top:12px;border-top:2px dashed var(--line);font-size:15px}
+.best .top3 b{font:400 16px 'Lilita One',sans-serif}
+.best .top3 ol{margin:4px 0 0;padding-left:22px}
+
+/* Semanas */
+.weeks{display:grid;gap:22px}
+.wk{background:var(--paper);border:2px solid var(--line);border-radius:6px;padding:16px;box-shadow:5px 5px 0 var(--shadow)}
+.wk header{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:12px;padding-bottom:10px;border-bottom:2px dashed var(--line)}
+.wk header small{color:var(--mute);font-size:14px;font-weight:600;white-space:nowrap}
 .days{display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
-.day{background:var(--bg);border:1.5px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:10px}
+.day{background:var(--bg);border:2px solid var(--line);border-radius:6px;padding:12px;display:flex;flex-direction:column;gap:10px}
 .day.we{background:var(--we)}
-.day.past{opacity:.45}
-.day.top{border-color:var(--yes);box-shadow:0 0 0 2px var(--yes) inset}
-.dname{font:700 16px Outfit,sans-serif;display:flex;flex-wrap:wrap;justify-content:space-between;gap:0 6px}
-.dname .n{color:var(--mute);font:500 14px Inter,sans-serif;white-space:nowrap}
-.bar{height:8px;border-radius:4px;background:var(--no);overflow:hidden;display:flex}
+.day.past{opacity:.4;border-style:dashed}
+.day.top{background:var(--yes);color:var(--yesink);box-shadow:3px 3px 0 var(--shadow);transform:rotate(-.6deg)}
+.day.top .dname .n{color:var(--yesink)}
+.day.top .pick button{background:var(--paper);color:var(--ink)}
+.dname{font:400 18px/1.1 'Lilita One',sans-serif;display:flex;flex-wrap:wrap;justify-content:space-between;gap:0 6px;letter-spacing:.2px}
+.dname .n{color:var(--mute);font:600 14px Figtree,sans-serif;white-space:nowrap}
+.bar{height:10px;border-radius:5px;background:transparent;border:2px solid var(--line);overflow:hidden;display:flex}
 .bar i{display:block;height:100%}
-.pick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
-.pick button{font:600 13px Inter,sans-serif;min-height:44px;border-radius:10px;border:1.5px solid var(--line);background:transparent;color:var(--ink);cursor:pointer;padding:4px}
-.pick button[aria-pressed=true].y{background:var(--yes);border-color:var(--yes);color:var(--yesink)}
-.pick button[aria-pressed=true].m{background:var(--maybe);border-color:var(--maybe);color:var(--maybeink)}
-.pick button[aria-pressed=true].n{background:var(--no);border-color:var(--no);color:var(--noink)}
+.pick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+.pick button{font:700 13px Figtree,sans-serif;min-height:44px;border-radius:6px;border:2px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer;padding:4px}
+.pick button:hover{background:var(--we)}
+.pick button[aria-pressed=true].y{background:var(--yes);color:var(--yesink)}
+.pick button[aria-pressed=true].m{background:var(--maybe);color:var(--maybeink)}
+.pick button[aria-pressed=true].n{background:var(--no);color:var(--noink)}
 .who{display:flex;flex-wrap:wrap;gap:4px;min-height:24px}
-.chip{font-size:13px;padding:2px 9px;border-radius:999px;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.chip{font-size:13px;font-weight:700;padding:1px 8px;border-radius:4px;border:2px solid var(--line);white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
 .chip.y{background:var(--yes);color:var(--yesink)}.chip.m{background:var(--maybe);color:var(--maybeink)}.chip.n{background:var(--no);color:var(--noink);text-decoration:line-through}
+
 .status{font-size:14px;color:var(--mute);margin-top:18px}
-.warn{background:var(--maybe);color:var(--maybeink);border-radius:12px;padding:12px 14px;margin-bottom:16px;font-size:15px}
-.more{margin-top:16px;font:600 15px Inter,sans-serif;min-height:44px;padding:0 18px;border-radius:12px;border:1.5px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
-.best .top3{grid-column:1/-1;margin-top:10px;font-size:14px}
-.best .top3 ol{margin:4px 0 0;padding-left:20px}
-.legend .vista{display:inline-flex;align-items:center;gap:8px;margin-left:auto}
-/* < 600px: um dia por linha, botões lado a lado (regras base acima) */
-@media(max-width:599px){.best{grid-template-columns:minmax(0,1fr)}.best .big{grid-row:auto}.legend .vista{margin-left:0}}
-/* ≥ 600px: dias em grelha, botões empilhados (3 lado a lado não cabem em ~140px) */
+.warn{background:var(--maybe);color:var(--maybeink);border:2px solid var(--line);border-radius:6px;padding:12px 14px;margin-bottom:16px;font-size:15px}
+.more{margin-top:22px;font:400 17px 'Lilita One',sans-serif;letter-spacing:.3px;min-height:48px;padding:0 20px;border-radius:6px;border:2px solid var(--line);background:var(--band);color:var(--bandink);cursor:pointer;box-shadow:3px 3px 0 var(--shadow)}
+.more:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--shadow)}
+
+@media(max-width:599px){
+  .topo .in{grid-template-columns:minmax(0,1fr)}
+  .prato{max-height:150px;max-width:300px}
+  .best{grid-template-columns:minmax(0,1fr)}.best .big{grid-row:auto}
+  .legend .vista{margin-left:0}
+}
 @media(min-width:600px){.days{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}.pick{grid-template-columns:minmax(0,1fr)}}
 @media(min-width:900px){.days{grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}.only-we .days{grid-template-columns:repeat(3,minmax(0,1fr))}.day{padding:10px}}
-@media(prefers-reduced-motion:no-preference){.bar i{transition:width .3s ease}}
-select{font:16px Inter,sans-serif;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);min-height:44px;max-width:100%}
-.me .alt{font-size:14px;color:var(--mute);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+@media(prefers-reduced-motion:no-preference){.bar i{transition:width .3s ease}.prato .bandeira{transform-origin:126px 30px;animation:abana 3s ease-in-out infinite}}
+@keyframes abana{0%,100%{transform:rotate(0)}50%{transform:rotate(-6deg)}}
