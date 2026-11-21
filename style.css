@@ -6,6 +6,7 @@
 --maybe:light-dark(#e6a817,#f0b72f);--maybeink:#1d1b17;
 --no:light-dark(#dcd6ca,#4a463f);--noink:light-dark(#1d1b17,#f2efe8);
 --best:light-dark(#fdf1c7,#2e2712);--erro:light-dark(#b3261e,#ff8a80);
+--edge:light-dark(#857e70,#857c6b); /* contorno de controlos: ≥3:1 sobre o fundo nos dois temas */
 --font:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
@@ -24,7 +25,7 @@ h2{font:700 18px/1.2 var(--font);margin:0}
 .me{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:end;margin-bottom:14px}
 .campo{display:grid;gap:4px;font-size:14px;font-weight:600}
 .campo.alt{color:var(--mute);font-weight:500}
-input[type=text],select{font:16px var(--font);padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);min-height:44px;max-width:100%}
+input[type=text],select{font:16px var(--font);padding:9px 12px;border:1px solid var(--edge);border-radius:8px;background:var(--bg);color:var(--ink);min-height:44px;max-width:100%}
 input[type=text]{width:min(240px,100%)}
 input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:14px;color:var(--mute)}
@@ -52,15 +53,21 @@ input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid 
 .days{display:grid;grid-template-columns:minmax(0,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
 .day{background:var(--bg);padding:12px;display:flex;flex-direction:column;gap:10px}
 .day.we{background:var(--surface)}
-.day.past{opacity:.45}
+.day.past{background:var(--surface);color:var(--mute)}
+.day.past .dname{font-weight:600}
+.day.past .bar{visibility:hidden}
+.none{color:var(--mute);font-size:14px}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 .day.top{background:var(--best)}
 .dname{font:700 16px/1.2 var(--font);display:flex;flex-wrap:wrap;justify-content:space-between;gap:0 6px}
 .dname .n{color:var(--mute);font-weight:500;font-size:14px;white-space:nowrap;font-variant-numeric:tabular-nums}
 .bar{height:6px;border-radius:3px;background:var(--line);overflow:hidden;display:flex}
 .bar i{display:block;height:100%}
 .pick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
-.pick button{font:600 14px var(--font);min-height:44px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer;padding:4px}
-@media(hover:hover){.pick button:hover{border-color:var(--mute)}}
+.pick button{font:600 14px var(--font);min-height:44px;border-radius:8px;border:1px solid var(--edge);background:var(--bg);color:var(--ink);cursor:pointer;padding:4px;display:inline-flex;align-items:center;justify-content:center;gap:4px}
+@media(hover:hover){.pick button:hover{border-color:var(--ink)}}
+.pick .ok{width:14px;height:14px;flex:none;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;display:none}
+.pick button[aria-pressed=true] .ok{display:block}
 .pick button[aria-pressed=true].y{background:var(--yes);border-color:var(--yes);color:var(--yesink)}
 .pick button[aria-pressed=true].m{background:var(--maybe);border-color:var(--maybe);color:var(--maybeink)}
 .pick button[aria-pressed=true].n{background:var(--no);border-color:var(--no);color:var(--noink)}
@@ -79,7 +86,7 @@ input[aria-invalid=true]{border-color:var(--erro);border-width:2px}
 .toast.erro{background:var(--erro);color:light-dark(#fff,#1d1b17)}
 @media(prefers-reduced-motion:no-preference){.toast{transition:opacity .2s cubic-bezier(.2,.8,.2,1),transform .2s cubic-bezier(.2,.8,.2,1)}}
 .warn{background:var(--maybe);color:var(--maybeink);border-radius:8px;padding:12px 14px;margin-bottom:16px;font-size:15px}
-.more{margin-top:24px;font:600 15px var(--font);min-height:44px;padding:0 18px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+.more{margin-top:24px;font:600 15px var(--font);min-height:44px;padding:0 18px;border-radius:8px;border:1px solid var(--edge);background:var(--bg);color:var(--ink);cursor:pointer}
 
 /* Até 899px: uma linha por dia (dia à esquerda, botões à direita, nomes por baixo só se houver) */
 @media(max-width:899px){
