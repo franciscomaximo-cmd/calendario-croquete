@@ -92,7 +92,11 @@ function render(){
   sel.value = cur;
 }
 
-function status(t){ $('#status').textContent = t }
+function status(t, erro){
+  const el = $('#status');
+  if (el.textContent !== t) el.textContent = t;   // role=status: não repetir o anúncio a cada atualização
+  el.classList.toggle('erro', !!erro);
+}
 
 // Aviso curto em baixo do ecrã, perto de onde se toca
 let toastTimer = null, toastAcao = null;
@@ -251,14 +255,14 @@ if (!window.supabase || !window.SUPABASE_URL || window.SUPABASE_URL.includes('O-
   status('Modo local.');
 } else {
   sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
-  carregar().catch(err => status('Erro a ligar ao Supabase: '+(err.message || err)));
+  carregar().catch(err => status('Erro a ligar ao Supabase: '+(err.message || err), true));
   let t = null;
-  const recarregar = () => { clearTimeout(t); t = setTimeout(() => carregar().catch(err => status('Erro a atualizar: '+(err.message || err))), 300) };
+  const recarregar = () => { clearTimeout(t); t = setTimeout(() => carregar().catch(err => status('Erro a atualizar: '+(err.message || err), true)), 300) };
   sb.channel('fds')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'disponibilidade' }, recarregar)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'pessoas' }, recarregar)
     .subscribe((s, err) => {
-      if (s === 'CHANNEL_ERROR' || s === 'TIMED_OUT') status('Tempo real indisponível ('+s+'). Recarrega a página para veres alterações dos outros.');
+      if (s === 'CHANNEL_ERROR' || s === 'TIMED_OUT') status('Tempo real indisponível ('+s+'). Recarrega a página para veres alterações dos outros.', true);
       if (s === 'SUBSCRIBED') recarregar();   // apanha o que mudou enquanto a ligação esteve em baixo
     });
 }

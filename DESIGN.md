@@ -36,6 +36,7 @@ Fonte do sistema (`--font`), sem fontes externas. Papéis: título do grupo 24�
 - **Botões de estado:** 44px de altura, contorno `--edge`; Livre leva texto e contorno `--yes` a 700 (é a resposta que mais interessa); escolhido = cor do estado + ✓ em SVG, e Ocupado escolhido leva ainda contorno de 2px em `--ink`. Abaixo de 380px sai o ✓; abaixo de 360px os botões passam para uma linha própria.
 - **Nomes:** etiqueta com a cor do estado; Talvez leva "?" e Ocupado é riscado (não depende só da cor).
 - **Melhor dia:** frase "Melhor dia: <data>" com a data em ligação para o dia; por baixo quem está livre ("Ana, Rui e Zé · talvez Marta") e "Também dá:" com os dois dias seguintes, sem repetir o vencedor.
+- **Estado da ligação:** 14px em `--mute` logo por baixo do melhor dia ("7 pessoas no grupo. Atualiza sozinho…"); erros de ligação ou de tempo real em `--erro` a 600.
 - **Aviso (toast):** fixo em baixo, tinta sobre fundo invertido; erro em `--erro`. Pode levar um botão de ação (44px, recebe o foco, 8s): escolher um nome em "Já marcaste noutro dispositivo?" pede "Sou eu" e depois oferece "Desfazer".
 
 ## Movimento

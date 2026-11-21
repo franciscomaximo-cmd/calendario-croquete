@@ -33,7 +33,7 @@ input[type=text]{width:100%}
 input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 
 /* Melhor dia: a data é o herói */
-.best{margin:20px 0 28px;padding:18px 0;border-block:1px solid var(--line)}
+.best{margin:20px 0 10px;padding:18px 0;border-block:1px solid var(--line)}
 .best .t{font:800 clamp(28px,6vw,40px)/1.1 var(--font);letter-spacing:-.02em;margin:0;text-wrap:balance}
 .best .t .lbl{font-weight:500;color:var(--mute)}
 .best .t a{color:inherit;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:6px;text-decoration-color:var(--maybe)}
@@ -78,7 +78,8 @@ input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid 
 .chip{font-size:13px;font-weight:600;padding:1px 8px;border-radius:6px;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
 .chip.y{background:var(--yes);color:var(--yesink)}.chip.m{background:var(--maybe);color:var(--maybeink)}.chip.n{background:var(--no);color:var(--noink);text-decoration:line-through}
 
-.status{font-size:14px;color:var(--mute);margin-top:18px}
+.status{font-size:14px;color:var(--mute);margin:0 0 28px}
+.status.erro{color:var(--erro);font-weight:600}
 .pastline{display:none;background:var(--bg);color:var(--mute);font-size:14px;padding:8px 12px;margin:0}
 .dup{flex-basis:100%;margin:0;font-size:14px;display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px}
 .dup button{font:600 14px var(--font);min-height:44px;padding:0 14px;border-radius:8px;border:1px solid var(--yes);background:var(--yes);color:var(--yesink);cursor:pointer}
