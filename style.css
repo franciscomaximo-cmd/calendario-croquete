@@ -53,16 +53,18 @@ input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid 
 .days{display:grid;grid-template-columns:minmax(0,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
 .day{background:var(--bg);padding:12px;display:flex;flex-direction:column;gap:10px}
 .day.we{background:var(--surface)}
-.day.past{background:var(--surface);color:var(--mute)}
+.day.past{color:var(--mute)}
 .day.past .dname{font-weight:600}
 .day.past .bar{visibility:hidden}
 .none{color:var(--mute);font-size:14px}
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 .day.top{background:var(--best)}
-.dname{font:700 16px/1.2 var(--font);display:flex;flex-wrap:wrap;justify-content:space-between;gap:0 6px}
+.dname{font:700 16px/1.2 var(--font);display:flex;flex-direction:column}
 .dname .n{color:var(--mute);font-weight:500;font-size:14px;white-space:nowrap;font-variant-numeric:tabular-nums}
-.bar{height:6px;border-radius:3px;background:var(--line);overflow:hidden;display:flex}
-.bar i{display:block;height:100%}
+.bar{position:relative;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+/* talvez = livres+talvez por baixo; livres por cima */
+.bar i{position:absolute;inset:0;transform-origin:left;transform:scaleX(var(--v,0))}
+.bar .y{background:var(--yes)}.bar .m{background:var(--maybe)}
 .pick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
 .pick button{font:600 14px var(--font);min-height:44px;border-radius:8px;border:1px solid var(--edge);background:var(--bg);color:var(--ink);cursor:pointer;padding:4px;display:inline-flex;align-items:center;justify-content:center;gap:4px}
 @media(hover:hover){.pick button:hover{border-color:var(--ink)}}
@@ -92,7 +94,7 @@ input[aria-invalid=true]{border-color:var(--erro);border-width:2px}
 @media(max-width:899px){
   .day{display:grid;grid-template-columns:84px minmax(0,1fr);grid-template-areas:"name pick" "bar pick" "who who";gap:6px 12px;align-items:center;padding:8px 12px}
   .day.past{grid-template-areas:"name who" "bar who"}
-  .dname{grid-area:name;flex-direction:column;gap:0}
+  .dname{grid-area:name}
   .bar{grid-area:bar}
   .pick{grid-area:pick}
   .who{grid-area:who;min-height:0}
@@ -102,4 +104,4 @@ input[aria-invalid=true]{border-color:var(--erro);border-width:2px}
 @media(max-width:399px){.pick button{font-size:13px;padding:2px}}
 /* 900px ou mais: a semana como um horário de 7 colunas */
 @media(min-width:900px){.days{grid-template-columns:repeat(7,minmax(0,1fr))}.only-we .days{grid-template-columns:repeat(3,minmax(0,1fr))}.day{padding:10px}.pick{grid-template-columns:minmax(0,1fr)}.only-we .pick{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(prefers-reduced-motion:no-preference){.bar i{transition:width .3s ease}}
+@media(prefers-reduced-motion:no-preference){.bar i{transition:transform .3s cubic-bezier(.2,.8,.2,1)}}

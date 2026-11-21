@@ -1,0 +1,42 @@
+# Design
+
+Sistema visual do calendário da croquetada. Produto e tom: ver [PRODUCT.md](PRODUCT.md). Modo: Operate (ferramenta de marcar e decidir).
+
+## Princípio
+
+Uma ferramenta sóbria. A cor só faz trabalho: identidade do grupo (faixa do título) e estados (Livre / Talvez / Ocupado). Sem cartões com sombra, sem ilustração, sem trocadilhos.
+
+## Cor (tokens em `style.css`, `light-dark()`; claro / escuro)
+
+| Token | Claro | Escuro | Uso |
+|---|---|---|---|
+| `--bg` | #faf9f6 | #15130f | fundo, dias normais |
+| `--surface` | #f1eee7 | #211e18 | sábado e domingo |
+| `--line` | #dcd6ca | #3b362d | linhas finas da grelha, separadores, fundo da barra |
+| `--edge` | #857e70 | #857c6b | contorno de controlos (≥3:1) |
+| `--ink` / `--mute` | #1d1b17 / #5f5a50 | #f2efe8 / #b3ab9c | texto / texto secundário |
+| `--band` / `--bandink` | #f2c230 / #1d1b17 | #2b2414 / #f2c230 | faixa do título (única superfície de cor) |
+| `--yes` / `--yesink` | #1f6f4a / #fff | #3fae7a / #0f1a14 | Livre |
+| `--maybe` / `--maybeink` | #e6a817 / #1d1b17 | #f0b72f / #1d1b17 | Talvez |
+| `--no` / `--noink` | #dcd6ca / #1d1b17 | #4a463f / #f2efe8 | Ocupado |
+| `--best` | #fdf1c7 | #2e2712 | dia em destaque (melhor dia) |
+| `--erro` | #b3261e | #ff8a80 | avisos de erro |
+
+Todos os pares de texto ≥4,5:1 e contornos ≥3:1 nos dois temas.
+
+## Tipo
+
+Fonte do sistema (`--font`), sem fontes externas. Papéis: título do grupo 24–36px/800; melhor dia 28–40px/800 (herói); títulos de semana 18px/700; corpo 16px; rótulos 14px/600; datas e metadados 14px em `--mute` com algarismos tabulares; nomes 13px/600.
+
+## Componentes
+
+- **Semana:** título + intervalo; dias numa grelha com linhas de 1px (`gap:1px` sobre `--line`), raio 10px, sem sombra.
+- **Dia:** até 899px uma linha (dia/data à esquerda, três botões à direita, nomes por baixo só se houver); a partir de 900px 7 colunas (3 em "só fins de semana") com botões empilhados.
+- **Botões de estado:** 44px de altura, contorno `--edge`; escolhido = cor do estado + ✓ em SVG.
+- **Nomes:** etiqueta com a cor do estado; Talvez leva "?" e Ocupado é riscado (não depende só da cor).
+- **Melhor dia:** frase "Melhor dia: <data>" com a data em ligação para o dia; Top 3 por baixo.
+- **Aviso (toast):** fixo em baixo, tinta sobre fundo invertido; erro em `--erro`.
+
+## Movimento
+
+Só a barra (transform `scaleX`) e o aviso (opacidade + 8px), ambos com ease-out e desligados com `prefers-reduced-motion`.
