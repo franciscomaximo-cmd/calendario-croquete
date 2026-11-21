@@ -32,6 +32,21 @@
     </div>
     <h2>Pessoas</h2>
     <ul class="pessoas" id="lista"></ul>
+    <form class="login pw" id="mudarpw" novalidate>
+      <h2>Mudar password</h2>
+      <label class="campo">Password atual
+        <input type="password" id="pwatual" autocomplete="current-password">
+      </label>
+      <label class="campo">Nova password
+        <input type="password" id="pwnova" autocomplete="new-password" aria-describedby="pwregra">
+      </label>
+      <p class="regra" id="pwregra">Pelo menos 8 caracteres.</p>
+      <label class="campo">Repetir nova password
+        <input type="password" id="pwrep" autocomplete="new-password">
+      </label>
+      <p class="dica-erro" id="pwerro" role="alert" hidden></p>
+      <button class="btn" type="submit">Mudar password</button>
+    </form>
   </section>
   <p class="status" id="status" role="status">A ligar…</p>
 </div></main>

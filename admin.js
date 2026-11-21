@@ -107,6 +107,46 @@ $('#lista').addEventListener('click', e => {
   juntar(p, d);
 });
 
+// ---- Password (nunca guardada nem escrita na consola: só passa dos campos para o Supabase) ----
+function validarNova(nova, rep){
+  if (nova.length < 8) return 'A nova password tem de ter pelo menos 8 caracteres.';
+  if (nova !== rep) return 'As duas passwords novas não coincidem.';
+  return '';
+}
+function erroPw(e){
+  const m = String((e && e.message) || '');
+  if (e && (e.code === 'same_password' || /different from the old/i.test(m))) return 'A nova password tem de ser diferente da atual.';
+  if (e && e.code === 'weak_password') return 'O Supabase achou a nova password demasiado fraca. Escolhe outra mais longa.';
+  if (/fetch|network|Failed/i.test(m)) return 'Sem ligação: a password não foi mudada.';
+  return 'Não deu para mudar a password. Tenta outra vez.';
+}
+function erroEm(id, t){ const el = $(id); el.textContent = t; el.hidden = !t }
+// Desativa o botão enquanto grava e repõe-no no fim, mesmo com erro
+async function aGravar(form, fn){
+  const bt = form.querySelector('button[type=submit]'), txt = bt.textContent;
+  bt.disabled = true; bt.textContent = 'A guardar…';
+  try { await fn() } finally { bt.disabled = false; bt.textContent = txt }
+}
+
+$('#mudarpw').addEventListener('submit', e => {
+  e.preventDefault();
+  const form = e.target, atual = $('#pwatual').value, nova = $('#pwnova').value;
+  erroEm('#pwerro', '');
+  if (!atual) return erroEm('#pwerro', 'Escreve a password atual.');
+  const invalida = validarNova(nova, $('#pwrep').value);
+  if (invalida) return erroEm('#pwerro', invalida);
+  aGravar(form, async () => {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) return mostrarLogin();
+    // o updateUser não pede a password atual: confirma-se primeiro com um login
+    const { error: e1 } = await sb.auth.signInWithPassword({ email: session.user.email, password: atual });
+    if (e1) return erroEm('#pwerro', e1.status === 400 ? 'A password atual não está certa.' : erroPw(e1));
+    const { error: e2 } = await sb.auth.updateUser({ password: nova });
+    if (e2) return erroEm('#pwerro', erroPw(e2));
+    form.reset(); toast('Password mudada.');
+  });
+});
+
 $('#login').addEventListener('submit', async e => {
   e.preventDefault();
   const erro = $('#loginerro'); erro.hidden = true;

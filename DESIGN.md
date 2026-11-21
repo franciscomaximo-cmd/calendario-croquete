@@ -42,7 +42,7 @@ Fonte do sistema (`--font`), sem fontes externas. Papéis: título do grupo 24�
 
 ## Admin (`admin.html`)
 
-Mesmo sistema: faixa do título, campos e botões iguais. Login numa coluna (máx. 320px). Lista de pessoas em linhas finas como os dias; nomes repetidos com fundo `--best` e etiqueta "repetido" em `--maybe`. Botões secundários `.sec` (contorno `--edge`); Apagar com contorno e texto `--erro`. Confirmações com `confirm()` nativo.
+Mesmo sistema: faixa do título, campos e botões iguais. Login numa coluna (máx. 320px). Lista de pessoas em linhas finas como os dias; nomes repetidos com fundo `--best` e etiqueta "repetido" em `--maybe`. Botões secundários `.sec` (contorno `--edge`); Apagar com contorno e texto `--erro`. Confirmações com `confirm()` nativo. "Mudar password" por baixo da lista, numa coluna (máx. 360px), com a regra "Pelo menos 8 caracteres." em `--mute` e o erro em `--erro` por cima do botão; o botão fica desativado e diz "A guardar…" enquanto grava.
 
 ## Movimento
 
