@@ -66,12 +66,13 @@ input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid 
 .bar .y{background:var(--yes)}.bar .m{background:var(--maybe)}
 .pick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
 .pick button{font:600 14px var(--font);min-height:44px;border-radius:8px;border:1px solid var(--edge);background:var(--bg);color:var(--ink);cursor:pointer;padding:4px;display:inline-flex;align-items:center;justify-content:center;gap:4px}
-@media(hover:hover){.pick button:hover{border-color:var(--ink)}}
+.pick button.y{color:var(--yes);border-color:var(--yes);font-weight:700}   /* Livre é a resposta que mais interessa */
+@media(hover:hover){.pick button:hover{border-color:var(--ink)}.pick button.y:hover{box-shadow:inset 0 0 0 1px var(--yes);border-color:var(--yes)}}
 .pick .ok{width:14px;height:14px;flex:none;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;display:none}
 .pick button[aria-pressed=true] .ok{display:block}
 .pick button[aria-pressed=true].y{background:var(--yes);border-color:var(--yes);color:var(--yesink)}
 .pick button[aria-pressed=true].m{background:var(--maybe);border-color:var(--maybe);color:var(--maybeink)}
-.pick button[aria-pressed=true].n{background:var(--no);border-color:var(--no);color:var(--noink)}
+.pick button[aria-pressed=true].n{background:var(--no);border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);color:var(--noink)}   /* cinzento sozinho mal se distingue de não escolhido */
 .who{display:flex;flex-wrap:wrap;gap:4px;min-height:22px}
 .chip{font-size:13px;font-weight:600;padding:1px 8px;border-radius:6px;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
 .chip.y{background:var(--yes);color:var(--yesink)}.chip.m{background:var(--maybe);color:var(--maybeink)}.chip.n{background:var(--no);color:var(--noink);text-decoration:line-through}
@@ -103,7 +104,9 @@ input[aria-invalid=true]{border-color:var(--erro);border-width:2px}
   .day.past{display:none}
   .pastline{display:block}
 }
-@media(max-width:399px){.pick button{font-size:13px;padding:2px}}
+@media(max-width:399px){.pick button{font-size:13px;padding:2px;gap:2px}}
+@media(max-width:379px){.pick button[aria-pressed=true] .ok{display:none}}   /* sem espaço para o ✓; o fundo cheio (e o contorno no Ocupado) chegam */
+@media(max-width:359px){.day{grid-template-areas:"name bar" "pick pick" "who who"}}
 /* 900px ou mais: a semana como um horário de 7 colunas */
 @media(min-width:900px){.days{grid-template-columns:repeat(7,minmax(0,1fr))}.only-we .days{grid-template-columns:repeat(3,minmax(0,1fr))}.day{padding:10px}.pick{grid-template-columns:minmax(0,1fr)}.only-we .pick{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(prefers-reduced-motion:no-preference){.bar i{transition:transform .3s cubic-bezier(.2,.8,.2,1)}}
