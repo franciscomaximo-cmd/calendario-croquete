@@ -22,6 +22,12 @@ h1{font:800 clamp(24px,4.4vw,36px)/1.1 var(--font);letter-spacing:-.02em;margin:
 .band{padding:20px max(4vw,16px) 48px}
 h2{font:700 18px/1.2 var(--font);margin:0}
 
+/* "Quem és tu?": só num dispositivo sem nome, num grupo que já tem pessoas */
+.ola{background:var(--surface);border-radius:10px;padding:16px;margin-bottom:4px;display:grid;gap:12px;justify-items:start}
+.ola h2{font:800 22px/1.2 var(--font);letter-spacing:-.01em}
+.ola .nomes{display:flex;flex-wrap:wrap;gap:8px}
+.linkbtn{font:500 15px var(--font);min-height:44px;padding:0;border:0;background:none;color:var(--ink);cursor:pointer;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--edge)}
+
 /* Nome e filtros */
 .me{display:flex;flex-wrap:wrap;gap:10px 12px;align-items:end}
 .campo{display:grid;gap:4px;font-size:14px;font-weight:600;flex:1 1 150px;max-width:260px}

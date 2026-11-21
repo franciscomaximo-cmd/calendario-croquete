@@ -12,6 +12,7 @@ let weeksShown = 6;
 let pessoas = {};   // id -> nome
 let disp = {};      // id -> { 'AAAA-MM-DD': 'y'|'m'|'n' }
 let sb = null;
+let souNovo = false;  // escolheu "Sou novo no grupo" (ou tocou num dia): não mostrar o "Quem és tu?"
 
 // Identidade: um id aleatório guardado neste browser
 const store = {
@@ -84,12 +85,18 @@ function render(){
     b.innerHTML = '<h2 class="t">Ainda ninguém está livre</h2><p class="s">Marca os dias em que podes e o melhor aparece aqui.</p>';
   }
 
+  const outros = Object.keys(pessoas).filter(id => id !== myId && pessoas[id].trim())
+    .sort((a,b) => nameOf(a).localeCompare(nameOf(b)));
   const sel = $('#claim'), cur = sel.value;
   sel.innerHTML = '<option value="">Escolhe o teu nome</option>' +
-    Object.keys(pessoas).filter(id => id !== myId && pessoas[id].trim())
-      .sort((a,b) => nameOf(a).localeCompare(nameOf(b)))
-      .map(id => `<option value="${id}">${esc(nameOf(id))}</option>`).join('');
+    outros.map(id => `<option value="${id}">${esc(nameOf(id))}</option>`).join('');
   sel.value = cur;
+
+  // "Quem és tu?": dispositivo sem nome num grupo que já tem pessoas
+  const ola = !souNovo && !$('#nick').value.trim() && outros.length > 0;
+  $('#ola').hidden = !ola; $('.me').hidden = ola;
+  const botoes = outros.map(id => `<button class="sec" type="button" data-id="${id}">${esc(nameOf(id))}</button>`).join('');
+  if (ola && $('#olanomes').innerHTML !== botoes) $('#olanomes').innerHTML = botoes;   // só refaz se mudou: não tirar o foco a quem usa o teclado
 }
 
 function status(t, erro){
@@ -123,6 +130,7 @@ let pendente = null;
 function pedirNome(k, v){
   const n = $('#nick');
   pendente = { k, v };
+  if (!souNovo) { souNovo = true; render() }   // fecha o "Quem és tu?" para mostrar o campo do nome
   const dn = document.getElementById('d-'+k).querySelector('.dname');
   $('#nickdica').textContent = `Escreve o teu nome: o teu "${LABEL[v]}" de ${dn.firstChild.textContent.toLowerCase()}, ${dn.querySelector('.n').textContent} fica marcado a seguir.`;
   $('#nickdica').hidden = false;
@@ -207,7 +215,7 @@ function trocarPara(id){
   toast('Agora marcas como '+nameOf(id)+'.', false, { label: 'Desfazer', fn: () => {
     serComo(antes.id, antes.nome);
     toast(antes.nome.trim() ? 'Voltaste a marcar como '+antes.nome.trim()+'.' : 'Troca desfeita.');
-    $('#nick').focus();
+    ($('#ola').hidden ? $('#nick') : $('#olanomes button')).focus();
   }});
   aplicarPendente();
 }
@@ -220,6 +228,9 @@ $('#claim').addEventListener('change', e => {
 document.addEventListener('click', e => {
   if (e.target.closest('.toast button') && toastAcao) { toastAcao.fn(); return }
   if (e.target.id === 'soueu' && dupId) { trocarPara(dupId); return }
+  const ola = e.target.closest('#olanomes button');
+  if (ola) { trocarPara(ola.dataset.id); return }
+  if (e.target.id === 'novo') { souNovo = true; render(); $('#nick').focus(); return }
   const bt = e.target.closest('.pick button');
   if (bt) { setDia(bt.dataset.k, bt.dataset.v); return }
   if (e.target.id === 'more') { weeksShown += 4; render() }

@@ -41,5 +41,5 @@ Para mudar nomes, juntar pessoas repetidas e apagar pessoas. Segue as instruçõ
 ## Notas
 
 - Quem tiver o link pode marcar e editar. Para um grupo de amigos chega; não partilhes o link publicamente.
-- Se alguém mudar de telemóvel/browser, usa "Já marcaste noutro dispositivo?" para voltar ao seu nome.
+- Se alguém mudar de telemóvel/browser, a página pergunta "Quem és tu?" com os nomes do grupo (ou usa "Já marcaste noutro dispositivo?" para voltar ao seu nome).
 - As semanas passadas deixam de aparecer e os dias já passados da semana atual ficam esbatidos e sem botões; as marcações antigas ficam na tabela e podem ser apagadas no Supabase quando quiseres.
