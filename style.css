@@ -86,6 +86,14 @@ input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid 
 .chip{font-size:13px;font-weight:600;padding:1px 8px;border-radius:6px;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
 .chip.y{background:var(--yes);color:var(--yesink)}.chip.m{background:var(--maybe);color:var(--maybeink)}.chip.n{background:var(--no);color:var(--noink);text-decoration:line-through}
 
+/* O teu motivo num dia Ocupado: campo aberto num só dia, nos outros texto + "editar" */
+.motivo{display:flex;flex-wrap:wrap;align-items:center;gap:2px 8px;font-size:14px;color:var(--mute)}
+.motivo b{color:var(--ink);font-weight:600;overflow-wrap:anywhere}
+.motivo small{font-size:13px}
+.nota-in{font-size:15px}
+@media(min-width:900px){input.nota-in{font-size:12px;padding:8px 6px}}   /* "Porquê? (opcional)" cabe na coluna do dia */
+.linkbtn.mini{font-size:14px;font-weight:600;color:var(--ink)}
+
 .status{font-size:14px;color:var(--mute);margin:0 0 28px}
 .status.erro{color:var(--erro);font-weight:600}
 .pastline{display:none;background:var(--bg);color:var(--mute);font-size:14px;padding:8px 12px;margin:0}
@@ -135,6 +143,7 @@ input[aria-invalid=true]{border-color:var(--erro);border-width:2px}
   .bar{grid-area:bar}
   .pick{grid-area:pick}
   .who{grid-area:who;min-height:0}
+  .motivo{grid-column:1/-1}   /* linha própria só quando existe */
   .who:not(:has(.chip)){display:none}
   .wk header{flex-direction:column;align-items:start;gap:2px}
   .day.past{display:none}

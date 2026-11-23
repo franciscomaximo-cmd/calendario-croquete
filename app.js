@@ -11,6 +11,9 @@ const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>'
 let weeksShown = 6;
 let pessoas = {};   // id -> nome
 let disp = {};      // id -> { 'AAAA-MM-DD': 'y'|'m'|'n' }
+let notas = {};     // id -> { 'AAAA-MM-DD': motivo do "Ocupado" }
+let notaAberta = null;   // dia com o campo "Porquê?" aberto: só um de cada vez
+let temNota = true;      // false se a coluna "nota" ainda não existir no Supabase (nota.sql por correr)
 let sb = null;
 let souNovo = false;  // escolheu "Sou novo no grupo" (ou tocou num dia): não mostrar o "Quem és tu?"
 
@@ -31,8 +34,40 @@ function mondays(n){
 }
 const nameOf = id => (pessoas[id] && pessoas[id].trim()) || 'Sem nome';
 const mine = () => disp[myId] || (disp[myId] = {});
+// Texto escrito por pessoas: espaços juntos, sem pontas, no máximo 40 caracteres (contados como o Postgres)
+const limpaNota = s => Array.from(String(s || '').replace(/\s+/g, ' ').trim()).slice(0, 40).join('').trim();
+const notaDe = (id, k) => limpaNota((notas[id] || {})[k]);
+const poeNota = (k, t) => { const n = notas[myId] || (notas[myId] = {}); if (t) n[k] = t; else delete n[k] };
+const rotulo = k => { const d = new Date(k+'T00:00'); return DIAS[(d.getDay()+6)%7].toLowerCase()+', '+fmt(d) };
 
+// O teu motivo num dia em que estás Ocupado: campo aberto, ou texto com "editar"/"acrescentar motivo"
+function motivoHtml(k){
+  if (!temNota || mine()[k] !== 'n') return '';
+  const nota = notaDe(myId, k);
+  if (notaAberta === k) return `<div class="motivo">
+    <input type="text" class="nota-in" data-k="${k}" maxlength="40" value="${esc(nota)}" placeholder="Porquê? (opcional)"
+      aria-label="Porquê estás ocupado ${rotulo(k)}? (opcional)" aria-describedby="vis-${k}" enterkeyhint="done" autocomplete="off">
+    <small id="vis-${k}">Visível para todo o grupo.</small></div>`;
+  return `<div class="motivo">${nota ? `<span>Motivo: <b>${esc(nota)}</b></span>` : ''}
+    <button type="button" class="linkbtn mini" data-nota="${k}" aria-label="${nota ? 'Editar o teu motivo' : 'Acrescentar motivo'} de ${rotulo(k)}">${nota ? 'editar' : 'acrescentar motivo'}</button></div>`;
+}
+// Só troca o bloco do motivo desse dia: um render completo substituía o botão em que se tocou a seguir e o clique perdia-se
+function atualizarMotivo(k){
+  const m = document.querySelector(`#d-${k} .motivo`);
+  if (m) m.outerHTML = motivoHtml(k);
+}
+
+let aRedesenhar = false;
 function render(){
+  // quem está a escrever o motivo não perde o texto, o foco nem o cursor quando a página se redesenha (ex.: tempo real)
+  const ativo = document.activeElement;
+  const rascunho = ativo && ativo.classList.contains('nota-in') ? { k: ativo.dataset.k, v: ativo.value, a: ativo.selectionStart, b: ativo.selectionEnd } : null;
+  aRedesenhar = true;
+  try { desenhar() } finally { aRedesenhar = false }
+  const i = rascunho && document.querySelector(`.nota-in[data-k="${rascunho.k}"]`);
+  if (i) { i.value = rascunho.v; i.focus({ preventScroll: true }); i.setSelectionRange(rascunho.a, rascunho.b) }
+}
+function desenhar(){
   const ids = Object.keys(disp).filter(id => Object.keys(disp[id]).length);
   const grupo = new Set([...Object.keys(pessoas), ...ids]).size || 1;
   const hoje = iso(new Date());
@@ -57,7 +92,7 @@ function render(){
         <div class="who">${ans.map(a => `<span class="chip ${a.v}" title="${LABEL[a.v]}">${esc(nameOf(a.id))}${a.v==='m' ? '<span aria-hidden="true">?</span>' : ''}<span class="vh"> (${LABEL[a.v].toLowerCase()})</span></span>`).join('')}</div>
         ${past ? '' : `<div class="pick" role="group" aria-label="A tua disponibilidade, ${name} ${fmt(d)}">
           ${['y','m','n'].map(v => `<button type="button" class="${v}" data-k="${k}" data-v="${v}" aria-pressed="${my===v}"><svg class="ok" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg>${LABEL[v]}</button>`).join('')}
-        </div>`}</div>`;
+        </div>${motivoHtml(k)}`}</div>`;
     }).join('');
     const title = wi===0 ? 'Esta semana' : wi===1 ? 'Próxima semana' : 'Semana de '+fmt(seg);
     const range = wi < 2 ? `${fmt(seg)} – ${fmt(dom)}` : `até ${fmt(dom)}`;
@@ -151,25 +186,50 @@ async function ensurePessoa(){
 
 async function setDia(k, v){
   if (!$('#nick').value.trim()) { pedirNome(k, v); return }   // sem nome, os outros não sabem quem marcou
-  const antes = mine()[k];
+  const antes = mine()[k], notaAntes = notaDe(myId, k);
   if (antes === v) delete mine()[k]; else mine()[k] = v;
+  poeNota(k, '');   // mudar de estado (ou desmarcar) apaga o motivo
+  notaAberta = mine()[k] === 'n' ? k : (notaAberta === k ? null : notaAberta);   // acabaste de marcar Ocupado: abre o "Porquê?"
+  const repor = () => { if (antes) mine()[k] = antes; else delete mine()[k]; poeNota(k, notaAntes); if (notaAberta === k) notaAberta = null; render() };
   render();
   if (!sb) return;
-  if (!(await ensurePessoa())) { if (antes) mine()[k] = antes; else delete mine()[k]; render(); return }
+  if (!(await ensurePessoa())) return repor();
   const novo = mine()[k];
   const gravar = () => novo
-    ? sb.from('disponibilidade').upsert({ pessoa_id: myId, dia: k, estado: novo, atualizado_em: new Date().toISOString() })
+    ? sb.from('disponibilidade').upsert({ pessoa_id: myId, dia: k, estado: novo, atualizado_em: new Date().toISOString(), ...(temNota ? { nota: null } : {}) })
     : sb.from('disponibilidade').delete().eq('pessoa_id', myId).eq('dia', k);
   let { error } = await gravar();
+  if (error && error.code === 'PGRST204' && temNota) { temNota = false; render(); ({ error } = await gravar()) }   // coluna "nota" ainda não existe: grava sem ela
   if (error && error.code === '23503') { // a linha em "pessoas" desapareceu (ex.: apagada no Supabase): recria e tenta de novo
     pessoaGuardada = false;
     if (await ensurePessoa()) ({ error } = await gravar());
   }
-  if (error) { // repõe se falhou
-    if (antes) mine()[k] = antes; else delete mine()[k];
-    render(); toast(erroPt('guardar', error), true);
-  } else toast(mine()[k] ? 'Guardado.' : 'Marcação removida.');
+  if (error) { repor(); toast(erroPt('guardar', error), true) }   // repõe se falhou
+  else toast(mine()[k] ? 'Guardado.' : 'Marcação removida.');
 }
+
+async function guardarNota(k, texto){
+  const nova = limpaNota(texto), antes = notaDe(myId, k);
+  notaAberta = null;
+  if (mine()[k] !== 'n' || nova === antes) return atualizarMotivo(k);
+  poeNota(k, nova); atualizarMotivo(k);
+  if (!sb) return;
+  const { error } = await sb.from('disponibilidade')
+    .upsert({ pessoa_id: myId, dia: k, estado: 'n', nota: nova || null, atualizado_em: new Date().toISOString() });
+  if (!error) return toast(nova ? 'Motivo guardado.' : 'Motivo apagado.');
+  poeNota(k, antes);
+  if (error.code === 'PGRST204') { temNota = false; render(); return toast('Os motivos ainda não estão ligados no Supabase.', true) }
+  atualizarMotivo(k); toast(erroPt('guardar o motivo', error), true);
+}
+// Grava ao sair do campo (Enter também sai); Escape desiste do que se escreveu
+document.addEventListener('focusout', e => {
+  if (e.target.classList && e.target.classList.contains('nota-in') && !aRedesenhar) guardarNota(e.target.dataset.k, e.target.value);
+});
+document.addEventListener('keydown', e => {
+  if (!e.target.classList || !e.target.classList.contains('nota-in')) return;
+  if (e.key === 'Escape') e.target.value = notaDe(myId, e.target.dataset.k);
+  if (e.key === 'Enter' || e.key === 'Escape') { e.preventDefault(); e.target.blur() }
+});
 
 let nickTimer = null;
 $('#nick').addEventListener('input', e => {
@@ -207,6 +267,7 @@ function serComo(id, nome){
   $('#nick').value = nome; store.set('fds_nome', nome);
   $('#nickdica').hidden = true; $('#nick').removeAttribute('aria-invalid');
   dupId = undefined; $('#nickdup').hidden = true;
+  notaAberta = null;
   render();
 }
 function trocarPara(id){
@@ -231,6 +292,14 @@ document.addEventListener('click', e => {
   const ola = e.target.closest('#olanomes button');
   if (ola) { trocarPara(ola.dataset.id); return }
   if (e.target.id === 'novo') { souNovo = true; render(); $('#nick').focus(); return }
+  const ed = e.target.closest('button[data-nota]');
+  if (ed) {   // abre o campo nesse dia e fecha o que estiver aberto noutro
+    const antes = notaAberta; notaAberta = ed.dataset.nota;
+    if (antes && antes !== notaAberta) atualizarMotivo(antes);
+    atualizarMotivo(notaAberta);
+    const i = document.querySelector(`.nota-in[data-k="${notaAberta}"]`); if (i) i.focus();
+    return;
+  }
   const bt = e.target.closest('.pick button');
   if (bt) { setDia(bt.dataset.k, bt.dataset.v); return }
   if (e.target.id === 'more') { weeksShown += 4; render() }
@@ -246,11 +315,16 @@ async function carregar(){
   const desde = iso(mondays(1)[0]);
   const [p, d] = await Promise.all([
     sb.from('pessoas').select('id,nome'),
-    sb.from('disponibilidade').select('pessoa_id,dia,estado').gte('dia', desde)
+    sb.from('disponibilidade').select('*').gte('dia', desde)   // '*': não falha se a coluna "nota" ainda não existir
   ]);
   if (p.error || d.error) throw (p.error || d.error);
   pessoas = {}; p.data.forEach(r => pessoas[r.id] = r.nome || '');
-  disp = {}; d.data.forEach(r => (disp[r.pessoa_id] ||= {})[r.dia] = r.estado);
+  disp = {}; notas = {};
+  d.data.forEach(r => {
+    (disp[r.pessoa_id] ||= {})[r.dia] = r.estado;
+    if (r.estado === 'n' && r.nota) (notas[r.pessoa_id] ||= {})[r.dia] = r.nota;
+  });
+  if (d.data.length) temNota = 'nota' in d.data[0];
   if (pessoas[myId] !== undefined) { pessoaGuardada = true; if (!$('#nick').value) $('#nick').value = pessoas[myId] }
   const n = Object.keys(pessoas).length;
   status(n ? `${n} ${n===1 ? 'pessoa no grupo' : 'pessoas no grupo'}. Atualiza sozinho quando alguém marca.` : 'Ainda ninguém respondeu. Sê o primeiro.');
