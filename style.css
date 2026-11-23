@@ -84,7 +84,10 @@ input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid 
 .pick button[aria-pressed=true].n{background:var(--no);border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);color:var(--noink)}   /* cinzento sozinho mal se distingue de não escolhido */
 .who{display:flex;flex-wrap:wrap;gap:4px;min-height:22px}
 .chip{font-size:13px;font-weight:600;padding:1px 8px;border-radius:6px;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
-.chip.y{background:var(--yes);color:var(--yesink)}.chip.m{background:var(--maybe);color:var(--maybeink)}.chip.n{background:var(--no);color:var(--noink);text-decoration:line-through}
+.chip.y{background:var(--yes);color:var(--yesink)}.chip.m{background:var(--maybe);color:var(--maybeink)}.chip.n{background:var(--no);color:var(--noink)}
+.chip.n .nm{text-decoration:line-through}   /* só o nome riscado; o motivo lê-se normal */
+.chip.com-nota{white-space:normal;overflow-wrap:anywhere}   /* com motivo pode ocupar duas linhas em vez de ser cortado */
+.chip .nt{font-weight:500}
 
 /* O teu motivo num dia Ocupado: campo aberto num só dia, nos outros texto + "editar" */
 .motivo{display:flex;flex-wrap:wrap;align-items:center;gap:2px 8px;font-size:14px;color:var(--mute)}
