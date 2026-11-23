@@ -93,8 +93,9 @@ input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid 
 .motivo{display:flex;flex-wrap:wrap;align-items:center;gap:2px 8px;font-size:14px;color:var(--mute)}
 .motivo b{color:var(--ink);font-weight:600;overflow-wrap:anywhere}
 .motivo small{font-size:13px}
+.nota-lbl{flex-basis:100%;font-size:13px;line-height:1.35;font-weight:600;color:var(--ink);overflow-wrap:anywhere}
 .nota-in{font-size:15px}
-@media(min-width:900px){input.nota-in{font-size:12px;padding:8px 6px}}   /* "Porquê? (opcional)" cabe na coluna do dia */
+@media(min-width:900px){input.nota-in{font-size:14px;padding:8px}}   /* coluna do dia estreita */
 .linkbtn.mini{font-size:14px;font-weight:600;color:var(--ink)}
 
 .status{font-size:14px;color:var(--mute);margin:0 0 28px}

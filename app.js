@@ -45,8 +45,9 @@ function motivoHtml(k){
   if (!temNota || mine()[k] !== 'n') return '';
   const nota = notaDe(myId, k);
   if (notaAberta === k) return `<div class="motivo">
-    <input type="text" class="nota-in" data-k="${k}" maxlength="40" value="${esc(nota)}" placeholder="Porquê? (opcional)"
-      aria-label="Porquê estás ocupado ${rotulo(k)}? (opcional)" aria-describedby="vis-${k}" enterkeyhint="done" autocomplete="off">
+    <label class="nota-lbl" for="nota-${k}">Estás ausente porque vais praticar o coito ou vais à saída de solteiros? Se quiseres, justifica a tua ausência.<span class="vh"> (${rotulo(k)})</span></label>
+    <input type="text" class="nota-in" id="nota-${k}" data-k="${k}" maxlength="40" value="${esc(nota)}" placeholder="ex.: exame"
+      aria-describedby="vis-${k}" enterkeyhint="done" autocomplete="off">
     <small id="vis-${k}">Visível para todo o grupo.</small></div>`;
   return `<div class="motivo">${nota ? `<span>Motivo: <b>${esc(nota)}</b></span>` : ''}
     <button type="button" class="linkbtn mini" data-nota="${k}" aria-label="${nota ? 'Editar o teu motivo' : 'Acrescentar motivo'} de ${rotulo(k)}">${nota ? 'editar' : 'acrescentar motivo'}</button></div>`;
