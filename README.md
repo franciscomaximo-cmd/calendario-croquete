@@ -13,6 +13,7 @@ Calendário partilhado para o grupo marcar, em cada dia da semana (segunda a dom
 | `supabase.sql` | Tabelas e permissões a criar no Supabase |
 | `admin.html`, `admin.js` | Página de admin (login, mudar nomes, juntar e apagar pessoas) |
 | `admin.sql` | Permissões do admin e função de juntar pessoas (correr depois do `supabase.sql`) |
+| `nota.sql` | Motivo opcional do "Ocupado" (correr depois do `admin.sql`) |
 
 ## 1. Criar a base de dados (Supabase, grátis)
 
