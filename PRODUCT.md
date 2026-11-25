@@ -35,9 +35,9 @@ Um calendário só do grupo, sem contas: cada um escreve o nome e marca Livre / 
 
 ## Brand Commitments
 
-- Tom sóbrio e limpo: uma ferramenta, não uma brincadeira.
-- O nome "croquete"/"croquetada" fica só no título, como identidade do grupo; sem trocadilhos espalhados pela interface.
-- Evitar: cartões e sombras genéricas, ilustrações decorativas, texto a mais.
+- Prático e claro primeiro, com alguma personalidade: a cor do grupo (violeta, escolhida pelo grupo), uma fonte própria nos títulos e pequenos efeitos que se notam sem atrasar ninguém.
+- O nome "croquete"/"croquetada" fica no título, como identidade do grupo; piadas só onde o grupo as pediu (ex.: a etiqueta do motivo do Ocupado), nunca espalhadas pela interface.
+- Evitar: cartões e sombras genéricas, ilustrações decorativas, texto a mais, efeitos que distraiam de marcar.
 
 ## Evidence on Hand
 
