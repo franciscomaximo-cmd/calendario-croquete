@@ -1,3 +1,6 @@
+/* Poppins nos títulos, servida pelo próprio site (só 700 e 800, latin); swap mostra logo a fonte do sistema */
+@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2")}
+@font-face{font-family:"Poppins";font-style:normal;font-weight:800;font-display:swap;src:url(fonts/poppins-latin-800-normal.woff2) format("woff2")}
 :root{color-scheme:light dark;
 /* Paleta Violeta (claro, escuro). Contraste verificado por tests/test_tokens.py */
 --bg:light-dark(#ffffff,#0f1020);--surface:light-dark(#f4f1fd,#181a2e);--line:light-dark(#e4e0f0,#2a2c44);
@@ -9,6 +12,7 @@
 --maybe:light-dark(#ffd21f,#f2c94c);--maybeink:#131627;--maybeedge:light-dark(#8a6a00,#f2c94c);   /* Talvez; o amarelo precisa de contorno no claro */
 --no:light-dark(#c62828,#d32f2f);--noink:#ffffff;   /* Ocupado */
 --erro:light-dark(#b3261e,#ff8a80);
+--display:"Poppins",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
 --font:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
@@ -19,14 +23,14 @@ body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--font);ov
 
 /* Topo: a única superfície de cor, identidade do grupo */
 .topo{background:var(--band);color:var(--bandink);padding:20px max(4vw,16px)}
-h1{font:800 clamp(24px,4.4vw,36px)/1.1 var(--font);letter-spacing:-.02em;margin:0;text-wrap:balance}
+h1{font:800 clamp(24px,4.4vw,36px)/1.1 var(--display);letter-spacing:-.01em;margin:0;text-wrap:balance}
 
 .band{padding:20px max(4vw,16px) 48px}
 h2{font:700 18px/1.2 var(--font);margin:0}
 
 /* "Quem és tu?": só num dispositivo sem nome, num grupo que já tem pessoas */
 .ola{background:var(--surface);border-radius:10px;padding:16px;margin-bottom:4px;display:grid;gap:12px;justify-items:start}
-.ola h2{font:800 22px/1.2 var(--font);letter-spacing:-.01em}
+.ola h2{font:800 22px/1.2 var(--display);letter-spacing:-.01em}
 .ola .nomes{display:flex;flex-wrap:wrap;gap:8px}
 .linkbtn{font:500 15px var(--font);min-height:44px;padding:0;border:0;background:none;color:var(--ink);cursor:pointer;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--edge)}
 
@@ -44,8 +48,8 @@ input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid 
 
 /* Melhor dia: a data é o herói */
 .best{margin:20px 0 10px;padding:18px 0;border-block:1px solid var(--line)}
-.best .t{font:800 clamp(28px,6vw,40px)/1.1 var(--font);letter-spacing:-.02em;margin:0;text-wrap:balance}
-.best .t .lbl{font-weight:500;color:var(--mute)}
+.best .t{font:800 clamp(28px,6vw,40px)/1.1 var(--display);letter-spacing:-.01em;margin:0;text-wrap:balance}
+.best .t .lbl{font-family:var(--font);font-weight:500;color:var(--mute)}
 .best .t a{color:inherit;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:6px;text-decoration-color:var(--brand)}
 .best.empty .t{font-size:22px}
 .best .s{color:var(--mute);font-size:16px;margin:6px 0 0}
@@ -57,6 +61,7 @@ input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid 
 
 /* Semanas: grelha de linhas finas, como um horário */
 .weeks{display:grid;gap:32px}
+.wk header h2{font-family:var(--display)}
 .wk header{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px}
 .wk header small{color:var(--mute);font-size:14px;font-variant-numeric:tabular-nums;white-space:nowrap}
 .wk header .feito{color:var(--yestxt);font-weight:600}
