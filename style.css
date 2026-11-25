@@ -165,4 +165,14 @@ input[aria-invalid=true]{border-color:var(--erro);border-width:2px}
 @media(max-width:359px){.day{grid-template-areas:"name bar" "pick pick" "who who"}}
 /* 900px ou mais: a semana como um horário de 7 colunas */
 @media(min-width:900px){.days{grid-template-columns:repeat(7,minmax(0,1fr))}.only-we .days{grid-template-columns:repeat(3,minmax(0,1fr))}.day{padding:10px}.pick{grid-template-columns:minmax(0,1fr)}.only-we .pick{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(prefers-reduced-motion:no-preference){.bar i{transition:transform .3s cubic-bezier(.2,.8,.2,1)}}
+/* Movimento: discreto, ≤250 ms, nunca bloqueia cliques; desligado com prefers-reduced-motion (tests/test_efeitos.py) */
+@media(prefers-reduced-motion:no-preference){
+  .bar i{transition:transform .25s cubic-bezier(.2,.8,.2,1)}
+  .pick button,.sec,.more,.btn,.linkbtn,.dup button,.toast button{transition:background-color .15s ease-out,border-color .15s ease-out,color .15s ease-out,box-shadow .15s ease-out}
+  .pick button.pop{animation:pop .2s cubic-bezier(.2,.8,.2,1)}   /* só o botão acabado de tocar (app.js) */
+  .pick button.pop .ok path{stroke-dasharray:16;stroke-dashoffset:16;animation:desenha .2s .05s ease-out forwards}
+  .topo>.wrap,.band>.wrap{animation:entrada .25s cubic-bezier(.2,.8,.2,1) both}
+}
+@keyframes pop{from{transform:scale(.94)}to{transform:scale(1)}}
+@keyframes desenha{to{stroke-dashoffset:0}}
+@keyframes entrada{from{opacity:0;transform:translateY(8px)}}

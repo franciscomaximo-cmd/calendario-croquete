@@ -203,6 +203,8 @@ async function setDia(k, v){
   notaAberta = mine()[k] === 'n' ? k : (notaAberta === k ? null : notaAberta);   // acabaste de marcar Ocupado: abre o "Porquê?"
   const repor = () => { if (antes) mine()[k] = antes; else delete mine()[k]; poeNota(k, notaAntes); if (notaAberta === k) notaAberta = null; render() };
   render();
+  const tocado = document.querySelector(`.pick button[data-k="${k}"][data-v="${v}"][aria-pressed="true"]`);
+  if (tocado) tocado.classList.add('pop');   // só o botão tocado anima (o CSS desliga com movimento reduzido)
   if (!sb) return;
   if (!(await ensurePessoa())) return repor();
   const novo = mine()[k];
