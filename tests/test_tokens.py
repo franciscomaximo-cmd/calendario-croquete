@@ -29,6 +29,7 @@ VIOLETA = {  # nome: (claro, escuro), da spec
     'yesink': ('#ffffff', '#ffffff'), 'yestxt': ('#0a4230', '#5cd6a0'), 'maybe': ('#ffd21f', '#f2c94c'),
     'maybeink': ('#131627', '#131627'), 'maybeedge': ('#8a6a00', '#f2c94c'), 'no': ('#c62828', '#d32f2f'),
     'noink': ('#ffffff', '#ffffff'), 'erro': ('#b3261e', '#ff8a80'), 'erroink': ('#ffffff', '#131627'),
+    'maybebar': ('#b07d00', '#f2c94c'),
 }
 REGRAS = [  # (a, b, mínimo)
     ('ink', 'bg', 4.5), ('ink', 'surface', 4.5), ('mute', 'bg', 4.5), ('mute', 'surface', 4.5),
@@ -36,6 +37,8 @@ REGRAS = [  # (a, b, mínimo)
     ('yes', 'bg', 3), ('yes', 'surface', 3), ('maybeedge', 'bg', 3), ('maybeedge', 'surface', 3),
     ('no', 'bg', 3), ('no', 'surface', 3), ('yesink', 'yes', 4.5), ('maybeink', 'maybe', 4.5), ('noink', 'no', 4.5),
     ('yes', 'maybe', 3), ('yestxt', 'bg', 4.5), ('yestxt', 'surface', 4.5), ('erro', 'bg', 4.5), ('erro', 'surface', 4.5), ('erroink', 'erro', 4.5),
+    # barra: os segmentos ficam lado a lado e sobre o fundo da barra (--bg)
+    ('yes', 'maybebar', 3), ('maybebar', 'bg', 3), ('maybebar', 'surface', 3),
 ]
 
 def main():
@@ -54,11 +57,16 @@ def main():
         falhas.append('risca colorida só num lado (side-stripe): usar contorno à volta')
     if 'light-dark(#' in CSS[CSS.index(ROOT) + len(ROOT):]:
         falhas.append('cor escrita à mão fora do :root')
+    barra = re.search(r'^\.bar\{[^}]*\}', CSS, re.M).group(0)   # a regra principal, não '.day.past .bar{'
+    if 'background:var(--bg)' not in barra:
+        falhas.append('fundo da barra tem de ser --bg (as regras de contraste da barra medem contra ele)')
+    if '.bar .m{background:var(--maybebar)}' not in CSS:
+        falhas.append('segmento Talvez da barra tem de usar --maybebar')
     if any(ord(c) < 32 and c not in '\n\r\t' for c in CSS):
         falhas.append('carácter de controlo no CSS (escape mal escrito?)')
     if re.search(r'--best\b', CSS):
         falhas.append('--best ainda existe (o melhor dia passa a ser a risca em --brand)')
-    print('\n'.join(falhas) if falhas else 'tokens OK: Violeta e 24 regras de contraste nos dois temas')
+    print('\n'.join(falhas) if falhas else 'tokens OK: Violeta e 27 regras de contraste nos dois temas')
     return 1 if falhas else 0
 
 if __name__ == '__main__':

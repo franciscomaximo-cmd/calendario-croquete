@@ -8,7 +8,7 @@ Prático e claro primeiro, com personalidade nos sítios certos. O violeta é a 
 
 ## Cor (tokens em `style.css`, `light-dark()`; claro / escuro)
 
-Todas as cores vivem no bloco `:root` de `style.css`; mudar uma cor é mudar uma linha. `tests/test_tokens.py` confirma os valores e 24 regras de contraste nos dois temas (`python -I tests/test_tokens.py`).
+Todas as cores vivem no bloco `:root` de `style.css`; mudar uma cor é mudar uma linha. `tests/test_tokens.py` confirma os valores e 27 regras de contraste nos dois temas (`python -I tests/test_tokens.py`).
 
 | Token | Claro | Escuro | Uso |
 |---|---|---|---|
@@ -22,7 +22,8 @@ Todas as cores vivem no bloco `:root` de `style.css`; mudar uma cor é mudar uma
 | `--yes` / `--yesink` | #0a4230 / #ffffff | #1f7a55 / #ffffff | Livre (preenchido) |
 | `--yestxt` | #0a4230 | #5cd6a0 | texto verde sobre o fundo (Livre por escolher, "marcaste tudo") |
 | `--maybe` / `--maybeink` | #ffd21f / #131627 | #f2c94c / #131627 | Talvez (preenchido) |
-| `--maybeedge` | #8a6a00 | #f2c94c | contorno do Talvez e segmento Talvez da barra (o amarelo sozinho não se vê no branco) |
+| `--maybeedge` | #8a6a00 | #f2c94c | contorno do Talvez (o amarelo sozinho não se vê no branco) |
+| `--maybebar` | #b07d00 | #f2c94c | segmento Talvez da barra (≥3:1 contra o verde ao lado e contra o fundo da barra) |
 | `--no` / `--noink` | #c62828 / #ffffff | #d32f2f / #ffffff | Ocupado |
 | `--erro` / `--erroink` | #b3261e / #ffffff | #ff8a80 / #131627 | avisos de erro |
 
@@ -39,7 +40,7 @@ Títulos em **Poppins** (`--display`), servida pelo próprio site em `fonts/` (s
 - **Topo do formulário:** nome + filtro na mesma linha; "Já marcaste noutro dispositivo?" fica num `<details>` discreto. Sem legenda: os botões já dizem o estado. Um toque sem nome fica guardado: a dica por baixo diz qual ("o teu "Livre" de sábado, 5 dez fica marcado a seguir") e, com Enter ou ao sair do campo, a marcação é feita e o dia volta ao ecrã. Escrever um nome que já existe (sem contar maiúsculas nem acentos) não grava nada e pergunta "Já existe Inês no grupo. É o teu nome?" com o botão "Sou eu" (Livre, 44px).
 - **Dia:** até 899px uma linha (dia/data à esquerda, três botões à direita, nomes por baixo só se houver) e os dias passados juntos numa linha ("Segunda a sexta já passaram."); sem "Sem respostas" e sem nomes nos dias passados. A partir de 900px 7 colunas (3 em "só fins de semana"): dia, data, linha reservada para "Melhor dia", barra e logo a seguir os botões, para ficarem alinhados entre colunas; os nomes vêm depois dos botões.
 - **Melhor dia na grelha:** fundo `--surface`, contorno de 2px em `--brand` à volta do dia e "Melhor dia" escrito em `--brand` 12px/700 por baixo da data (nada de riscas laterais).
-- **Barra:** 6px; Livre em `--yes`, Talvez em `--maybeedge`, sobre `--line`.
+- **Barra:** 6px; Livre em `--yes`, Talvez em `--maybebar`, sobre fundo `--bg` com contorno de 1px em `--line` (assim a barra vazia continua a ver-se).
 - **Botões de estado:** 44px de altura, contorno `--edge`; Livre por escolher leva texto `--yestxt` e contorno `--yes` a 700 (é a resposta que mais interessa); escolhido = cor do estado + ✓ em SVG; Talvez escolhido com contorno `--maybeedge`; Ocupado escolhido com contorno de 2px em `--ink`. Abaixo de 380px sai o ✓; abaixo de 360px os botões passam para uma linha própria.
 - **O teu motivo (Ocupado):** ao marcar Ocupado abre-se nesse dia um campo com a etiqueta por cima ("Estás ausente porque vais praticar o coito ou vais à saída de solteiros? Se quiseres, justifica a tua ausência.", 13px/600, parte em várias linhas sem alargar a coluna), placeholder curto "ex.: exame" e "Visível para todo o grupo." por baixo; só um aberto de cada vez. Nos teus outros dias Ocupado: "Motivo: **exame**" + ligação "editar", ou só "acrescentar motivo". Grava com Enter ou ao sair; Escape desiste.
 - **Nomes:** etiqueta com a cor do estado; Talvez leva "?" e contorno `--maybeedge`; no Ocupado o nome é riscado (não depende só da cor). Com motivo: "Rui · exame", só o nome riscado e o motivo a 500; a etiqueta pode partir em duas linhas para o motivo se ler inteiro sem hover.
