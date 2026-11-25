@@ -119,6 +119,8 @@ input[aria-invalid=true]{border-color:var(--erro);border-width:2px}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 .toast.acao{pointer-events:auto;display:flex;align-items:center;gap:12px;padding-block:6px}
 .toast button{font:700 15px var(--font);min-height:44px;padding:0 14px;border-radius:8px;border:0;background:var(--bg);color:var(--ink);cursor:pointer}
+.toast.cima{bottom:auto;top:max(16px,env(safe-area-inset-top));transform:translate(-50%,-8px)}   /* não tapar o campo do motivo (app.js) */
+.toast.cima.on{transform:translate(-50%,0)}
 .toast button:focus-visible{outline:2px solid var(--bg);outline-offset:2px}
 .toast.erro{background:var(--erro);color:var(--erroink)}
 @media(prefers-reduced-motion:no-preference){.toast{transition:opacity .2s cubic-bezier(.2,.8,.2,1),transform .2s cubic-bezier(.2,.8,.2,1)}}

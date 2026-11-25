@@ -46,7 +46,7 @@ Títulos em **Poppins** (`--display`), servida pelo próprio site em `fonts/` (s
 - **Nomes:** etiqueta com a cor do estado; Talvez leva "?" e contorno `--maybeedge`; no Ocupado o nome é riscado (não depende só da cor). Com motivo: "Rui · exame", só o nome riscado e o motivo a 500; a etiqueta pode partir em duas linhas para o motivo se ler inteiro sem hover.
 - **Melhor dia (topo):** frase "Melhor dia: <data>" com a data em ligação para o dia, sublinhada em `--brand`; por baixo quem está livre ("Ana, Rui e Zé · talvez Marta") e "Também dá:" com os dois dias seguintes, sem repetir o vencedor.
 - **Estado da ligação:** 14px em `--mute` logo por baixo do melhor dia, com `text-wrap: pretty`; erros de ligação ou de tempo real em `--erro` a 600.
-- **Aviso (toast):** fixo em baixo, tinta sobre fundo invertido; erro em `--erro` com texto `--erroink`. Pode levar um botão de ação (44px, recebe o foco, 8s): escolher um nome em "Já marcaste noutro dispositivo?" pede "Sou eu" e depois oferece "Desfazer".
+- **Aviso (toast):** fixo em baixo, tinta sobre fundo invertido; erro em `--erro` com texto `--erroink`. Se o campo do motivo estiver aberto na zona de baixo do ecrã, o aviso aparece em cima para não o tapar. Pode levar um botão de ação (44px, recebe o foco, 8s): escolher um nome em "Já marcaste noutro dispositivo?" pede "Sou eu" e depois oferece "Desfazer".
 
 ## Admin (`admin.html`)
 

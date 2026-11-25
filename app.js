@@ -156,6 +156,9 @@ let toastTimer = null, toastAcao = null;
 function toast(t, erro, acao){   // acao = { label, fn }: botão no aviso, que recebe o foco
   const el = $('#toast');
   el.textContent = t; el.classList.toggle('erro', !!erro); el.classList.add('on');
+  // campo do motivo aberto na zona de baixo do ecrã: o aviso aparece em cima para não o tapar
+  const campo = document.querySelector('.nota-in'), r = campo && campo.getBoundingClientRect();
+  el.classList.toggle('cima', !!r && r.bottom > innerHeight - 110 && r.top < innerHeight);
   toastAcao = acao || null;
   el.classList.toggle('acao', !!acao);
   if (acao) { const b = document.createElement('button'); b.type = 'button'; b.textContent = acao.label; el.append(' ', b); b.focus() }
