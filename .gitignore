@@ -1,4 +1,5 @@
 .vscode/
 .claude/settings.local.json
-.impeccable/
+.impeccable/*
+!.impeccable/design-full.md
 .playwright-mcp/
