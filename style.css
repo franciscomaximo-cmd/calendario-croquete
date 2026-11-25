@@ -1,18 +1,20 @@
 :root{color-scheme:light dark;
---bg:light-dark(#faf9f6,#15130f);--surface:light-dark(#f1eee7,#211e18);--line:light-dark(#dcd6ca,#3b362d);
---ink:light-dark(#1d1b17,#f2efe8);--mute:light-dark(#5f5a50,#b3ab9c);
---band:light-dark(#f2c230,#2b2414);--bandink:light-dark(#1d1b17,#f2c230);
---yes:light-dark(#1f6f4a,#3fae7a);--yesink:light-dark(#ffffff,#0f1a14);
---maybe:light-dark(#e6a817,#f0b72f);--maybeink:#1d1b17;
---no:light-dark(#dcd6ca,#4a463f);--noink:light-dark(#1d1b17,#f2efe8);
---best:light-dark(#fdf1c7,#2e2712);--erro:light-dark(#b3261e,#ff8a80);
---edge:light-dark(#857e70,#857c6b); /* contorno de controlos: ≥3:1 sobre o fundo nos dois temas */
+/* Paleta Violeta (claro, escuro). Contraste verificado por tests/test_tokens.py */
+--bg:light-dark(#ffffff,#0f1020);--surface:light-dark(#f4f1fd,#181a2e);--line:light-dark(#e4e0f0,#2a2c44);
+--ink:light-dark(#131627,#f2f0fb);--mute:light-dark(#565a6e,#b3b1c8);
+--edge:light-dark(#858aa0,#7c7c96); /* contorno de controlos: ≥3:1 sobre o fundo nos dois temas */
+--band:#6f00fd;--bandink:#ffffff;   /* faixa do título: violeta do grupo */
+--brand:light-dark(#6f00fd,#a983ff);   /* destaque: melhor dia, sublinhados, seleção */
+--yes:light-dark(#0a4230,#1f7a55);--yesink:#ffffff;--yestxt:light-dark(#0a4230,#5cd6a0);   /* Livre; yestxt = texto verde sobre o fundo */
+--maybe:light-dark(#ffd21f,#f2c94c);--maybeink:#131627;--maybeedge:light-dark(#8a6a00,#f2c94c);   /* Talvez; o amarelo precisa de contorno no claro */
+--no:light-dark(#c62828,#d32f2f);--noink:#ffffff;   /* Ocupado */
+--erro:light-dark(#b3261e,#ff8a80);
 --font:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
 [hidden]{display:none!important}   /* senão um display:grid/flex numa classe ganha ao atributo hidden */
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--font);overflow-x:clip;accent-color:var(--yes);caret-color:var(--ink)}
-::selection{background:var(--maybe);color:var(--maybeink)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--font);overflow-x:clip;accent-color:var(--brand);caret-color:var(--ink)}
+::selection{background:var(--band);color:var(--bandink)}
 .wrap{max-width:1040px;margin:0 auto}
 
 /* Topo: a única superfície de cor, identidade do grupo */
@@ -44,7 +46,7 @@ input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid 
 .best{margin:20px 0 10px;padding:18px 0;border-block:1px solid var(--line)}
 .best .t{font:800 clamp(28px,6vw,40px)/1.1 var(--font);letter-spacing:-.02em;margin:0;text-wrap:balance}
 .best .t .lbl{font-weight:500;color:var(--mute)}
-.best .t a{color:inherit;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:6px;text-decoration-color:var(--maybe)}
+.best .t a{color:inherit;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:6px;text-decoration-color:var(--brand)}
 .best.empty .t{font-size:22px}
 .best .s{color:var(--mute);font-size:16px;margin:6px 0 0}
 .best .s .nomes{color:var(--ink);font-weight:600}
@@ -57,7 +59,7 @@ input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid 
 .weeks{display:grid;gap:32px}
 .wk header{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px}
 .wk header small{color:var(--mute);font-size:14px;font-variant-numeric:tabular-nums;white-space:nowrap}
-.wk header .feito{color:var(--yes);font-weight:600}
+.wk header .feito{color:var(--yestxt);font-weight:600}
 .days{display:grid;grid-template-columns:minmax(0,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
 .day{background:var(--bg);padding:12px;display:flex;flex-direction:column;gap:10px}
 .day.we{background:var(--surface)}
@@ -66,25 +68,25 @@ input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid 
 .day.past .bar{visibility:hidden}
 .day.past .who{visibility:hidden}   /* quem pôde num dia que já passou não ajuda a decidir */
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
-.day.top{background:var(--best)}
+.day.top{background:var(--surface);box-shadow:inset 4px 0 0 var(--brand)}   /* melhor dia: risca na margem, não só um tom de fundo */
 .dname{font:700 16px/1.2 var(--font);display:flex;flex-direction:column}
 .dname .n{color:var(--mute);font-weight:500;font-size:14px;white-space:nowrap;font-variant-numeric:tabular-nums}
 .bar{position:relative;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
 /* talvez = livres+talvez por baixo; livres por cima */
 .bar i{position:absolute;inset:0;transform-origin:left;transform:scaleX(var(--v,0))}
-.bar .y{background:var(--yes)}.bar .m{background:var(--maybe)}
+.bar .y{background:var(--yes)}.bar .m{background:var(--maybeedge)}
 .pick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
 .pick button{font:600 14px var(--font);min-height:44px;border-radius:8px;border:1px solid var(--edge);background:var(--bg);color:var(--ink);cursor:pointer;padding:4px;display:inline-flex;align-items:center;justify-content:center;gap:4px}
-.pick button.y{color:var(--yes);border-color:var(--yes);font-weight:700}   /* Livre é a resposta que mais interessa */
+.pick button.y{color:var(--yestxt);border-color:var(--yes);font-weight:700}   /* Livre é a resposta que mais interessa */
 @media(hover:hover){.pick button:hover{border-color:var(--ink)}.pick button.y:hover{box-shadow:inset 0 0 0 1px var(--yes);border-color:var(--yes)}}
 .pick .ok{width:14px;height:14px;flex:none;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;display:none}
 .pick button[aria-pressed=true] .ok{display:block}
 .pick button[aria-pressed=true].y{background:var(--yes);border-color:var(--yes);color:var(--yesink)}
-.pick button[aria-pressed=true].m{background:var(--maybe);border-color:var(--maybe);color:var(--maybeink)}
-.pick button[aria-pressed=true].n{background:var(--no);border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);color:var(--noink)}   /* cinzento sozinho mal se distingue de não escolhido */
+.pick button[aria-pressed=true].m{background:var(--maybe);border-color:var(--maybeedge);color:var(--maybeink)}
+.pick button[aria-pressed=true].n{background:var(--no);border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);color:var(--noink)}   /* contorno forte: separa o vermelho do verde para quem não distingue as duas cores */
 .who{display:flex;flex-wrap:wrap;gap:4px;min-height:22px}
 .chip{font-size:13px;font-weight:600;padding:1px 8px;border-radius:6px;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
-.chip.y{background:var(--yes);color:var(--yesink)}.chip.m{background:var(--maybe);color:var(--maybeink)}.chip.n{background:var(--no);color:var(--noink)}
+.chip.y{background:var(--yes);color:var(--yesink)}.chip.m{background:var(--maybe);color:var(--maybeink);box-shadow:inset 0 0 0 1px var(--maybeedge)}.chip.n{background:var(--no);color:var(--noink)}
 .chip.n .nm{text-decoration:line-through}   /* só o nome riscado; o motivo lê-se normal */
 .chip.com-nota{white-space:normal;overflow-wrap:anywhere}   /* com motivo pode ocupar duas linhas em vez de ser cortado */
 .chip .nt{font-weight:500}
@@ -121,7 +123,7 @@ input[aria-invalid=true]{border-color:var(--erro);border-width:2px}
 /* Admin (admin.html) */
 .login{display:grid;gap:14px;max-width:320px}
 .login .campo{max-width:none}
-.btn{justify-self:start;font:600 15px var(--font);min-height:44px;padding:0 22px;border-radius:8px;border:1px solid var(--yes);background:var(--yes);color:var(--yesink);cursor:pointer}
+.btn{justify-self:start;font:600 15px var(--font);min-height:44px;padding:0 22px;border-radius:8px;border:1px solid var(--band);background:var(--band);color:var(--bandink);cursor:pointer}
 .btn:disabled{opacity:.6;cursor:progress}
 .pw{margin:8px 0 32px;padding-top:20px;border-top:1px solid var(--line);max-width:360px}
 .regra{margin:-6px 0 0;font-size:14px;color:var(--mute)}
@@ -131,7 +133,7 @@ input[aria-invalid=true]{border-color:var(--erro);border-width:2px}
 .barra .status{margin:0}
 .pessoas{list-style:none;margin:12px 0 20px;padding:0;display:grid;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
 .pessoa{background:var(--bg);padding:14px 12px;display:grid;gap:10px}
-.pessoa.rep{background:var(--best)}
+.pessoa.rep{background:var(--surface);box-shadow:inset 4px 0 0 var(--brand)}
 .linha{display:flex;flex-wrap:wrap;gap:8px;align-items:end}
 .linha .campo{flex:1 1 180px;max-width:320px}
 .meta{margin:0;font-size:14px;color:var(--mute);font-variant-numeric:tabular-nums}
