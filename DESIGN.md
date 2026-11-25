@@ -31,7 +31,7 @@ Regras: texto ≥4,5:1; contornos e preenchimentos de estado ≥3:1 contra `--bg
 
 ## Tipo
 
-Títulos em **Poppins** (`--display`), servida pelo próprio site em `fonts/` (só 700 e 800, subconjunto latin, `font-display: swap`, licença OFL em `fonts/OFL.txt`); o resto na fonte do sistema (`--font`). Papéis: título do grupo 24–36px/800 Poppins; data do melhor dia 28–40px/800 Poppins ("Melhor dia:" fica na fonte do sistema a 500); títulos de semana 18px/700 Poppins; "Quem és tu?" 22px/800 Poppins; corpo 16px; rótulos 14px/600; datas e metadados 14px em `--mute` com algarismos tabulares; nomes 13px/600. Espaçamento de letras dos títulos grandes -.01em (a Poppins já é estreita). `tests/test_fonte.py` confirma os ficheiros, o `swap` e que nada vem do Google Fonts.
+Títulos em **Poppins** (`--display`), servida pelo próprio site em `fonts/` (só 700 e 800, subconjunto latin, `font-display: swap`, licença OFL em `fonts/OFL.txt`) e, enquanto carrega, uma fonte de recurso "Poppins fallback" (Arial negrito, ou Helvetica/Roboto) com `size-adjust` e `ascent/descent/line-gap-override` medidos para o 800, para o título e a data não saltarem; o resto na fonte do sistema (`--font`). Papéis: título do grupo 24–36px/800 Poppins; data do melhor dia 28–40px/800 Poppins ("Melhor dia:" fica na fonte do sistema a 500); títulos de semana 18px/700 Poppins; "Quem és tu?" 22px/800 Poppins; corpo 16px; rótulos 14px/600; datas e metadados 14px em `--mute` com algarismos tabulares; nomes 13px/600. Espaçamento de letras dos títulos grandes -.01em (a Poppins já é estreita). `tests/test_fonte.py` confirma os ficheiros, o `swap` e que nada vem do Google Fonts.
 
 ## Componentes
 

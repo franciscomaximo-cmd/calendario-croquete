@@ -28,8 +28,14 @@ def main():
     for html in ('index.html', 'admin.html'):
         if re.search(r'fonts\.(googleapis|gstatic)\.com', (RAIZ / html).read_text(encoding='utf-8')):
             falhas.append(f'{html}: ainda pede fontes ao Google')
-    if '--display:"Poppins"' not in CSS:
-        falhas.append('token --display com "Poppins" falta')
+    if '--display:"Poppins","Poppins fallback",' not in CSS:
+        falhas.append('token --display tem de ser "Poppins","Poppins fallback",… (recurso com métricas antes da fonte do sistema)')
+    recurso = re.search(r'@font-face\{font-family:"Poppins fallback";[^}]*\}', CSS)
+    if not recurso:
+        falhas.append('@font-face "Poppins fallback" falta (reduz o salto quando a Poppins carrega)')
+    else:
+        for prop in ('size-adjust:', 'ascent-override:', 'descent-override:', 'line-gap-override:', 'src:local('):
+            if prop not in recurso.group(0): falhas.append(f'"Poppins fallback" sem {prop}')
     for sel in ('h1{', '.best .t{', '.wk header h2', '.ola h2{'):
         regra = re.search(re.escape(sel) + r'[^}]*\}', CSS)
         if not regra or 'var(--display)' not in regra.group(0):
