@@ -28,14 +28,14 @@ VIOLETA = {  # nome: (claro, escuro), da spec
     'bandink': ('#ffffff', '#ffffff'), 'brand': ('#6f00fd', '#a983ff'), 'yes': ('#0a4230', '#1f7a55'),
     'yesink': ('#ffffff', '#ffffff'), 'yestxt': ('#0a4230', '#5cd6a0'), 'maybe': ('#ffd21f', '#f2c94c'),
     'maybeink': ('#131627', '#131627'), 'maybeedge': ('#8a6a00', '#f2c94c'), 'no': ('#c62828', '#d32f2f'),
-    'noink': ('#ffffff', '#ffffff'), 'erro': ('#b3261e', '#ff8a80'),
+    'noink': ('#ffffff', '#ffffff'), 'erro': ('#b3261e', '#ff8a80'), 'erroink': ('#ffffff', '#131627'),
 }
 REGRAS = [  # (a, b, mínimo)
     ('ink', 'bg', 4.5), ('ink', 'surface', 4.5), ('mute', 'bg', 4.5), ('mute', 'surface', 4.5),
     ('bandink', 'band', 4.5), ('edge', 'bg', 3), ('edge', 'surface', 3), ('brand', 'bg', 3), ('brand', 'surface', 3),
     ('yes', 'bg', 3), ('yes', 'surface', 3), ('maybeedge', 'bg', 3), ('maybeedge', 'surface', 3),
     ('no', 'bg', 3), ('no', 'surface', 3), ('yesink', 'yes', 4.5), ('maybeink', 'maybe', 4.5), ('noink', 'no', 4.5),
-    ('yes', 'maybe', 3), ('yestxt', 'bg', 4.5), ('yestxt', 'surface', 4.5), ('erro', 'bg', 4.5), ('erro', 'surface', 4.5),
+    ('yes', 'maybe', 3), ('yestxt', 'bg', 4.5), ('yestxt', 'surface', 4.5), ('erro', 'bg', 4.5), ('erro', 'surface', 4.5), ('erroink', 'erro', 4.5),
 ]
 
 def main():
@@ -50,9 +50,15 @@ def main():
                 falhas.append(f'{tema}: {a}/{b} = {ratio(t[a], t[b]):.2f} < {m}')
         if 'band' in t and 'bg' in t and tema == 'escuro' and ratio(t['band'], t['bg']) < 2:
             falhas.append(f'escuro: faixa/fundo = {ratio(t["band"], t["bg"]):.2f} < 2')
+    if re.search(r'inset\s+\d+px\s+0\s+0', CSS):
+        falhas.append('risca colorida só num lado (side-stripe): usar contorno à volta')
+    if 'light-dark(#' in CSS[CSS.index(ROOT) + len(ROOT):]:
+        falhas.append('cor escrita à mão fora do :root')
+    if any(ord(c) < 32 and c not in '\n\r\t' for c in CSS):
+        falhas.append('carácter de controlo no CSS (escape mal escrito?)')
     if re.search(r'--best\b', CSS):
         falhas.append('--best ainda existe (o melhor dia passa a ser a risca em --brand)')
-    print('\n'.join(falhas) if falhas else 'tokens OK: Violeta e 23 regras de contraste nos dois temas')
+    print('\n'.join(falhas) if falhas else 'tokens OK: Violeta e 24 regras de contraste nos dois temas')
     return 1 if falhas else 0
 
 if __name__ == '__main__':

@@ -11,7 +11,7 @@
 --yes:light-dark(#0a4230,#1f7a55);--yesink:#ffffff;--yestxt:light-dark(#0a4230,#5cd6a0);   /* Livre; yestxt = texto verde sobre o fundo */
 --maybe:light-dark(#ffd21f,#f2c94c);--maybeink:#131627;--maybeedge:light-dark(#8a6a00,#f2c94c);   /* Talvez; o amarelo precisa de contorno no claro */
 --no:light-dark(#c62828,#d32f2f);--noink:#ffffff;   /* Ocupado */
---erro:light-dark(#b3261e,#ff8a80);
+--erro:light-dark(#b3261e,#ff8a80);--erroink:light-dark(#ffffff,#131627);
 --display:"Poppins",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
 --font:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
@@ -73,7 +73,8 @@ input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid 
 .day.past .bar{visibility:hidden}
 .day.past .who{visibility:hidden}   /* quem pôde num dia que já passou não ajuda a decidir */
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
-.day.top{background:var(--surface);box-shadow:inset 4px 0 0 var(--brand)}   /* melhor dia: risca na margem, não só um tom de fundo */
+.day.top{background:var(--surface);box-shadow:inset 0 0 0 2px var(--brand)}   /* melhor dia: contorno violeta + "Melhor dia" escrito, não só um tom de fundo */
+.day.top .dname::after{content:"Melhor dia";color:var(--brand);font-size:12px;line-height:16px;font-weight:700;margin-top:2px}
 .dname{font:700 16px/1.2 var(--font);display:flex;flex-direction:column}
 .dname .n{color:var(--mute);font-weight:500;font-size:14px;white-space:nowrap;font-variant-numeric:tabular-nums}
 .bar{position:relative;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
@@ -105,7 +106,7 @@ input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid 
 @media(min-width:900px){input.nota-in{font-size:14px;padding:8px}}   /* coluna do dia estreita */
 .linkbtn.mini{font-size:14px;font-weight:600;color:var(--ink)}
 
-.status{font-size:14px;color:var(--mute);margin:0 0 28px}
+.status{font-size:14px;color:var(--mute);margin:0 0 28px;text-wrap:pretty}
 .status.erro{color:var(--erro);font-weight:600}
 .pastline{display:none;background:var(--bg);color:var(--mute);font-size:14px;padding:8px 12px;margin:0}
 .dup{flex-basis:100%;margin:0;font-size:14px;display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px}
@@ -119,7 +120,7 @@ input[aria-invalid=true]{border-color:var(--erro);border-width:2px}
 .toast.acao{pointer-events:auto;display:flex;align-items:center;gap:12px;padding-block:6px}
 .toast button{font:700 15px var(--font);min-height:44px;padding:0 14px;border-radius:8px;border:0;background:var(--bg);color:var(--ink);cursor:pointer}
 .toast button:focus-visible{outline:2px solid var(--bg);outline-offset:2px}
-.toast.erro{background:var(--erro);color:light-dark(#fff,#1d1b17)}
+.toast.erro{background:var(--erro);color:var(--erroink)}
 @media(prefers-reduced-motion:no-preference){.toast{transition:opacity .2s cubic-bezier(.2,.8,.2,1),transform .2s cubic-bezier(.2,.8,.2,1)}}
 .warn{background:var(--maybe);color:var(--maybeink);border-radius:8px;padding:12px 14px;margin-bottom:16px;font-size:15px}
 .more,.sec{font:600 15px var(--font);min-height:44px;padding:0 18px;border-radius:8px;border:1px solid var(--edge);background:var(--bg);color:var(--ink);cursor:pointer}
@@ -138,7 +139,7 @@ input[aria-invalid=true]{border-color:var(--erro);border-width:2px}
 .barra .status{margin:0}
 .pessoas{list-style:none;margin:12px 0 20px;padding:0;display:grid;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
 .pessoa{background:var(--bg);padding:14px 12px;display:grid;gap:10px}
-.pessoa.rep{background:var(--surface);box-shadow:inset 4px 0 0 var(--brand)}
+.pessoa.rep{background:var(--surface)}   /* a etiqueta "repetido" já o diz */
 .linha{display:flex;flex-wrap:wrap;gap:8px;align-items:end}
 .linha .campo{flex:1 1 180px;max-width:320px}
 .meta{margin:0;font-size:14px;color:var(--mute);font-variant-numeric:tabular-nums}
@@ -164,7 +165,9 @@ input[aria-invalid=true]{border-color:var(--erro);border-width:2px}
 @media(max-width:379px){.pick button[aria-pressed=true] .ok{display:none}}   /* sem espaço para o ✓; o fundo cheio (e o contorno no Ocupado) chegam */
 @media(max-width:359px){.day{grid-template-areas:"name bar" "pick pick" "who who"}}
 /* 900px ou mais: a semana como um horário de 7 colunas */
-@media(min-width:900px){.days{grid-template-columns:repeat(7,minmax(0,1fr))}.only-we .days{grid-template-columns:repeat(3,minmax(0,1fr))}.day{padding:10px}.pick{grid-template-columns:minmax(0,1fr)}.only-we .pick{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(min-width:900px){.dname,.bar{order:-2}.pick{order:-1}   /* botões logo abaixo do dia: alinhados entre colunas */
+.dname::after{content:"\a0";font-size:12px;line-height:16px;margin-top:2px}   /* linha reservada em todos os dias: o "Melhor dia" não desalinha a coluna */
+.days{grid-template-columns:repeat(7,minmax(0,1fr))}.only-we .days{grid-template-columns:repeat(3,minmax(0,1fr))}.day{padding:10px}.pick{grid-template-columns:minmax(0,1fr)}.only-we .pick{grid-template-columns:repeat(3,minmax(0,1fr))}}
 /* Movimento: discreto, ≤250 ms, nunca bloqueia cliques; desligado com prefers-reduced-motion (tests/test_efeitos.py) */
 @media(prefers-reduced-motion:no-preference){
   .bar i{transition:transform .25s cubic-bezier(.2,.8,.2,1)}
