@@ -26,7 +26,7 @@ Um calendário só do grupo, sem contas: cada um escreve o nome e marca Livre / 
 
 ## Capabilities and Constraints
 
-- Semanas de segunda a domingo: a atual e as seguintes (6 por omissão, "mais" acrescenta 4); filtro "Semana toda / Só fins de semana" (sexta a domingo).
+- Semanas de segunda a domingo: a atual e as seguintes (6 por omissão), uma de cada vez, como folhas de um bloco (abre na semana atual; folhear com o dedo a partir de qualquer margem, setas ou ← →); na última folha "Ver mais semanas" acrescenta 4. Filtro "Semana toda / Só fins de semana" (sexta a domingo).
 - Dias já passados da semana atual não se podem marcar.
 - Três estados por dia e por pessoa: Livre, Talvez, Ocupado; tocar outra vez no estado ativo remove a marcação.
 - Melhor dia (com os nomes de quem pode) e mais dois que também dão, só de hoje em diante.

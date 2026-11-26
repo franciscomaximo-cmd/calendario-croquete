@@ -68,13 +68,20 @@ function atualizarMotivo(k){
   if (c && mine()[k]) c.outerHTML = chipHtml({ id: myId, v: mine()[k] }, k);
 }
 
-let aRedesenhar = false;
+let aRedesenhar = false, renderPendente = false, maisPendente = false;
+// "Ver mais semanas": +4 folhas e avança para a primeira nova
+function maisSemanas(){ const antes = weeksShown; weeksShown += 4; render(); Folhas.irPara(antes) }
 function render(){
+  // a meio de uma dobra o DOM das folhas não pode ser refeito: redesenha quando a folha assentar (aoAcabar)
+  if (Folhas.ocupado()) { renderPendente = true; return }
+  renderPendente = false;
   // quem está a escrever o motivo não perde o texto, o foco nem o cursor quando a página se redesenha (ex.: tempo real)
   const ativo = document.activeElement;
   const rascunho = ativo && ativo.classList.contains('nota-in') ? { k: ativo.dataset.k, v: ativo.value, a: ativo.selectionStart, b: ativo.selectionEnd } : null;
+  const folhaFoco = ativo && ativo.classList.contains('folha') ? ativo.dataset.i : null;   // foco no teclado fica na folha refeita
   aRedesenhar = true;
   try { desenhar() } finally { aRedesenhar = false }
+  if (folhaFoco !== null) { const f = document.querySelector(`#weeks > .folha[data-i="${folhaFoco}"]`); if (f) f.focus({ preventScroll: true }) }
   const i = rascunho && document.querySelector(`.nota-in[data-k="${rascunho.k}"]`);
   if (i) { i.value = rascunho.v; i.focus({ preventScroll: true }); i.setSelectionRange(rascunho.a, rascunho.b) }
 }
@@ -110,8 +117,10 @@ function desenhar(){
     // no telemóvel os dias passados ficam numa só linha (o CSS esconde os .day.past)
     const pastline = passados.length ? `<p class="pastline">${passados.length===1 ? passados[0]+' já passou.' : passados[0]+' a '+passados.at(-1).toLowerCase()+' já passaram.'}</p>` : '';
     const feito = !porMarcar ? '' : marcados === porMarcar ? ' · <b class="feito">marcaste tudo</b>' : ` · marcaste ${marcados} de ${porMarcar}`;
-    return `<article class="wk"><header><h2>${title}</h2><small>${range}${feito}</small></header><div class="days">${pastline}${days}</div></article>`;
+    // cada semana é uma folha do bloco (folhas.js trata da dobra); .clip/.conteudo/.vinco/.sombra-baixo são do motor
+    return `<article class="folha wk" data-i="${wi}" role="group" aria-label="${title}, ${fmt(seg)} a ${fmt(dom)}" tabindex="-1"><div class="clip"><div class="conteudo"><header><h2>${title}</h2><small>${range}${feito}</small></header><div class="days">${pastline}${days}</div></div><div class="vinco"></div></div><div class="sombra-baixo"></div></article>`;
   }).join('');
+  Folhas.refazer();
 
   // Mais livres primeiro, depois mais "talvez", depois o mais cedo
   cands.sort((a,b) => b.y-a.y || b.m-a.m || a.k.localeCompare(b.k));
@@ -128,7 +137,8 @@ function desenhar(){
     const el = document.querySelector(`.day[data-k="${best.k}"]`); if (el) el.classList.add('top');
   } else {
     b.className = 'best empty';
-    b.innerHTML = '<h2 class="t">Ainda ninguém está livre</h2><p class="s">Marca os dias em que podes e o melhor aparece aqui.</p>';
+    // curto: numa linha; a explicação só enquanto ninguém marcou nada
+    b.innerHTML = '<h2 class="t">Ainda ninguém está livre</h2>' + (ids.length ? '' : '<p class="s">Marca os dias em que podes.</p>');
   }
 
   const outros = Object.keys(pessoas).filter(id => id !== myId && pessoas[id].trim())
@@ -299,10 +309,12 @@ function trocarPara(id){
 // Escolher um nome não troca logo: pede "Sou eu" e depois oferece "Desfazer"
 $('#claim').addEventListener('change', e => {
   const id = e.target.value; e.target.value = ''; if (!id) return;
+  $('.alt').open = false;
   toast('Marcar como '+nameOf(id)+'?', false, { label: 'Sou eu', fn: () => trocarPara(id) });
 });
 
 document.addEventListener('click', e => {
+  if ($('.alt').open && !e.target.closest('.alt')) $('.alt').open = false;   // menu do "outro dispositivo" fecha ao tocar fora
   if (e.target.closest('.toast button') && toastAcao) { toastAcao.fn(); return }
   if (e.target.id === 'soueu' && dupId) { trocarPara(dupId); return }
   const ola = e.target.closest('#olanomes button');
@@ -318,7 +330,18 @@ document.addEventListener('click', e => {
   }
   const bt = e.target.closest('.pick button');
   if (bt) { setDia(bt.dataset.k, bt.dataset.v); return }
-  if (e.target.id === 'more') { weeksShown += 4; render() }
+  if (e.target.id === 'more') { if (Folhas.ocupado()) maisPendente = true; else maisSemanas(); return }   // a meio de um ressalto: quando a folha assentar
+  // "Melhor dia" e "Também dá": mudar para a folha desse dia e destacá-lo
+  const lig = e.target.closest('a[href^="#d-"]');
+  if (lig) {
+    const dia = document.getElementById(lig.getAttribute('href').slice(1)), folha = dia && dia.closest('.folha');
+    if (!folha) return;
+    e.preventDefault();
+    if (Folhas.ocupado()) return;   // a meio de uma dobra: não deslizar para um dia de outra folha
+    Folhas.irPara(Number(folha.dataset.i), { animar: false });
+    dia.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    dia.classList.add('destaque'); setTimeout(() => dia.classList.remove('destaque'), 1500);
+  }
 });
 
 $('#vista').value = soFds ? 'fds' : 'all';
@@ -349,6 +372,15 @@ async function carregar(){
 
 $('#nick').value = store.get('fds_nome') || '';
 if ($('#nick').value) pessoas[myId] = $('#nick').value.trim();
+Folhas.montar($('#caixa'), {
+  aoMudar(i){   // folha nova abre no topo; o foco vai para ela, exceto se veio das setas (continuam a carregar com Enter)
+    const f = document.querySelector(`#weeks > .folha[data-i="${i}"]`); if (!f) return;
+    f.querySelector('.conteudo').scrollTop = 0;
+    const a = document.activeElement;
+    if (!(a && (a.id === 'ant' || a.id === 'seg') && !a.disabled)) f.focus({ preventScroll: true });
+  },
+  aoAcabar(){ if (renderPendente) render(); if (maisPendente) { maisPendente = false; maisSemanas() } }
+});
 render();
 
 if (!window.supabase || !window.SUPABASE_URL || window.SUPABASE_URL.includes('O-TEU-PROJETO')) {
