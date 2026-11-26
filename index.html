@@ -33,12 +33,26 @@
   </div>
   <div id="best" class="best empty"><h2 class="t">A carregar…</h2></div>
   <p class="status" id="status" role="status">A ligar…</p>
-  <section class="weeks" id="weeks" aria-label="Semanas"></section>
-  <button class="more" id="more" type="button">Mostrar mais 4 semanas</button>
+  <section class="bloco" id="bloco" aria-label="Semanas">
+    <div class="lombada" aria-hidden="true"></div>
+    <div class="folhas-caixa" id="caixa">
+      <div class="weeks folhas" id="weeks"></div>
+      <div class="aba" aria-hidden="true"><div class="aba-clip"><div class="aba-papel"><div class="aba-curva"></div></div></div></div>
+      <div class="zonas" id="zonas" aria-hidden="true"><i data-z="t"></i><i data-z="b"></i><i data-z="l"></i><i data-z="r"></i><i data-z="tl"></i><i data-z="tr"></i><i data-z="bl"></i><i data-z="br"></i></div>
+    </div>
+    <nav class="barra" id="barra" aria-label="Mudar de semana">
+      <button type="button" class="seta" id="ant" aria-label="Semana anterior"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <div class="pontos" id="pontos" aria-hidden="true"></div>
+      <span class="qual" id="qual" aria-live="polite"></span>
+      <button class="more" id="more" type="button" hidden>Ver mais semanas</button>
+      <button type="button" class="seta" id="seg" aria-label="Semana seguinte"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+    </nav>
+  </section>
 </div></main>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script src="config.js"></script>
+<script src="folhas.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

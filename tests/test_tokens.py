@@ -30,6 +30,7 @@ VIOLETA = {  # nome: (claro, escuro), da spec
     'maybeink': ('#131627', '#131627'), 'maybeedge': ('#8a6a00', '#f2c94c'), 'no': ('#c62828', '#d32f2f'),
     'noink': ('#ffffff', '#ffffff'), 'erro': ('#b3261e', '#ff8a80'), 'erroink': ('#ffffff', '#131627'),
     'maybebar': ('#b07d00', '#f2c94c'),
+    'verso': ('#eeeaf8', '#1f2238'),   # verso das folhas do bloco (só decoração)
 }
 REGRAS = [  # (a, b, mínimo)
     ('ink', 'bg', 4.5), ('ink', 'surface', 4.5), ('mute', 'bg', 4.5), ('mute', 'surface', 4.5),

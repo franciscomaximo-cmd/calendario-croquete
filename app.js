@@ -110,8 +110,10 @@ function desenhar(){
     // no telemóvel os dias passados ficam numa só linha (o CSS esconde os .day.past)
     const pastline = passados.length ? `<p class="pastline">${passados.length===1 ? passados[0]+' já passou.' : passados[0]+' a '+passados.at(-1).toLowerCase()+' já passaram.'}</p>` : '';
     const feito = !porMarcar ? '' : marcados === porMarcar ? ' · <b class="feito">marcaste tudo</b>' : ` · marcaste ${marcados} de ${porMarcar}`;
-    return `<article class="wk"><header><h2>${title}</h2><small>${range}${feito}</small></header><div class="days">${pastline}${days}</div></article>`;
+    // cada semana é uma folha do bloco (folhas.js trata da dobra); .clip/.conteudo/.vinco/.sombra-baixo são do motor
+    return `<article class="folha wk" data-i="${wi}" role="group" aria-label="${title}, ${fmt(seg)} a ${fmt(dom)}" tabindex="-1"><div class="clip"><div class="conteudo"><header><h2>${title}</h2><small>${range}${feito}</small></header><div class="days">${pastline}${days}</div></div><div class="vinco"></div></div><div class="sombra-baixo"></div></article>`;
   }).join('');
+  Folhas.refazer();
 
   // Mais livres primeiro, depois mais "talvez", depois o mais cedo
   cands.sort((a,b) => b.y-a.y || b.m-a.m || a.k.localeCompare(b.k));
@@ -349,6 +351,7 @@ async function carregar(){
 
 $('#nick').value = store.get('fds_nome') || '';
 if ($('#nick').value) pessoas[myId] = $('#nick').value.trim();
+Folhas.montar($('#caixa'), { aoMudar(){}, aoAcabar(){} });
 render();
 
 if (!window.supabase || !window.SUPABASE_URL || window.SUPABASE_URL.includes('O-TEU-PROJETO')) {

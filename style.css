@@ -11,7 +11,7 @@
 --band:#6f00fd;--bandink:#ffffff;   /* faixa do título: violeta do grupo */
 --brand:light-dark(#6f00fd,#a983ff);   /* destaque: melhor dia, sublinhados, seleção */
 --yes:light-dark(#0a4230,#1f7a55);--yesink:#ffffff;--yestxt:light-dark(#0a4230,#5cd6a0);   /* Livre; yestxt = texto verde sobre o fundo */
---maybe:light-dark(#ffd21f,#f2c94c);--maybeink:#131627;--maybeedge:light-dark(#8a6a00,#f2c94c);--maybebar:light-dark(#b07d00,#f2c94c);   /* Talvez; o amarelo precisa de contorno no claro */
+--maybe:light-dark(#ffd21f,#f2c94c);--maybeink:#131627;--maybeedge:light-dark(#8a6a00,#f2c94c);--maybebar:light-dark(#b07d00,#f2c94c);--verso:light-dark(#eeeaf8,#1f2238);   /* Talvez; o amarelo precisa de contorno no claro */
 --no:light-dark(#c62828,#d32f2f);--noink:#ffffff;   /* Ocupado */
 --erro:light-dark(#b3261e,#ff8a80);--erroink:light-dark(#ffffff,#131627);
 --display:"Poppins","Poppins fallback",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
@@ -62,7 +62,58 @@ input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid 
 .day{scroll-margin-top:16px}
 
 /* Semanas: grelha de linhas finas, como um horário */
-.weeks{display:grid;gap:32px}
+/* Bloco de folhas: uma semana de cada vez; folhas.js enrola a folha (page curl). Só transforms durante a dobra. */
+.bloco{margin-top:4px}
+.lombada{position:relative;z-index:5;height:30px;border-radius:10px 10px 4px 4px;background:var(--band)}
+.lombada::after{content:"";position:absolute;left:10px;right:10px;bottom:-5px;border-bottom:2px dashed var(--line)}   /* picotado */
+.folhas-caixa{position:relative;margin-top:2px}
+.folhas{display:grid}
+.folhas::before,.folhas::after{content:"";grid-area:1/1;border-radius:0 0 10px 10px;background:var(--bg);border:1px solid var(--edge)}   /* espessura do bloco */
+.folhas::before{transform:translate(4px,6px)}
+.folhas::after{transform:translate(2px,3px)}
+.folha{grid-area:1/1;position:relative;visibility:hidden;display:flex;flex-direction:column}
+.folha.ver{visibility:visible}
+.folha:focus{outline:none}
+.folha:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.clip{position:relative;flex:1;display:flex;flex-direction:column}
+.conteudo{flex:1;position:relative;background:var(--bg);border:1px solid var(--line);border-radius:0 0 10px 10px;padding:14px 22px 46px}
+.conteudo::after{content:"";position:absolute;right:0;bottom:0;width:30px;height:30px;border-bottom-right-radius:10px;pointer-events:none;
+  background:linear-gradient(315deg,var(--bg) 0 46%,var(--line) 46% 49%,var(--verso) 49% 68%,transparent 68%)}   /* canto puxador */
+.conteudo .days{border-width:1px 0;border-radius:0}   /* a folha já é a moldura */
+.dobrar{overflow:hidden;border-radius:0 0 10px 10px}
+.dobrar .clip{position:absolute;left:0;top:0;overflow:hidden;transform-origin:0 0}
+.dobrar .conteudo{position:absolute;left:0;top:0;transform-origin:0 0}
+.vinco{position:absolute;left:0;top:0;width:70px;height:100%;pointer-events:none;display:none}
+.dobrar .vinco{display:block;background:linear-gradient(90deg,rgb(0 0 0/.22),rgb(0 0 0/.06) 30px,transparent 70px)}
+.sombra-baixo{position:absolute;left:0;top:0;width:60px;transform-origin:0 0;pointer-events:none;display:none;background:linear-gradient(90deg,rgb(0 0 0/.22),transparent 60px)}
+.folha.baixo{overflow:hidden;border-radius:0 0 10px 10px}
+.folha.baixo .sombra-baixo{display:block}
+.aba{position:absolute;left:0;top:0;transform-origin:0 0;pointer-events:none;display:none;z-index:6}
+.aba.on{display:block}
+.aba-clip{position:absolute;left:0;top:0;overflow:hidden;transform-origin:0 0}
+.aba-papel{position:absolute;left:0;top:0;transform-origin:0 0;overflow:hidden;background:var(--verso);border:1px solid var(--line);border-radius:0 0 10px 10px}
+.aba-curva{position:absolute;left:0;top:0;width:90px;transform-origin:0 0;background:linear-gradient(90deg,rgb(0 0 0/.18),rgb(255 255 255/.45) 14px,rgb(0 0 0/.05) 50px,transparent 90px)}
+/* zonas de agarrar: 32 px nas margens (12 px saem para a margem da página), 56 px nos cantos; o meio faz scroll e marca */
+.zonas{position:absolute;inset:0 -12px -12px;z-index:7;pointer-events:none}
+.zonas i{position:absolute;pointer-events:auto;touch-action:none;user-select:none;-webkit-user-select:none}
+.zonas [data-z=t]{left:12px;right:12px;top:0;height:32px}
+.zonas [data-z=b]{left:0;right:0;bottom:0;height:32px}
+.zonas [data-z=l]{left:0;top:0;bottom:0;width:32px}
+.zonas [data-z=r]{right:0;top:0;bottom:0;width:32px}
+.zonas [data-z=tl]{left:0;top:0;width:56px;height:50px}
+.zonas [data-z=tr]{right:0;top:0;width:56px;height:50px}
+.zonas [data-z=bl]{left:0;bottom:0;width:56px;height:56px}
+.zonas [data-z=br]{right:0;bottom:0;width:56px;height:56px}
+/* barra de navegação presa ao fundo do ecrã enquanto o bloco está à vista */
+.barra{position:sticky;bottom:0;z-index:8;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:14px;padding:10px 0 calc(10px + env(safe-area-inset-bottom,0px));background:var(--bg);border-top:1px solid var(--line)}
+.seta{width:44px;height:44px;flex:none;border-radius:22px;border:1px solid var(--edge);background:var(--bg);color:var(--ink);cursor:pointer;display:grid;place-items:center}
+.seta svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.seta:disabled{opacity:.35;cursor:default}
+.pontos{display:flex;gap:6px}
+.pontos i{width:8px;height:8px;border-radius:4px;background:var(--line)}
+.pontos i.on{width:20px;background:var(--brand)}
+.qual{font-size:14px;color:var(--mute);font-variant-numeric:tabular-nums;white-space:nowrap}
+.barra .more{margin:0;padding:0 14px}
 .wk header h2{font-family:var(--display)}
 .wk header{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px}
 .wk header small{color:var(--mute);font-size:14px;font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -165,9 +216,10 @@ input[aria-invalid=true]{border-color:var(--erro);border-width:2px}
   .day.past{display:none}
   .pastline{display:block}
 }
-@media(max-width:399px){.pick button{font-size:13px;padding:2px;gap:2px}}
-@media(max-width:379px){.pick button[aria-pressed=true] .ok{display:none}}   /* sem espaço para o ✓; o fundo cheio (e o contorno no Ocupado) chegam */
-@media(max-width:359px){.day{grid-template-areas:"name bar" "pick pick" "who who"}}
+/* pontos de quebra ~50 px acima dos antigos: a folha (margens + contorno) come essa largura */
+@media(max-width:449px){.pick button{font-size:13px;padding:2px;gap:2px}}
+@media(max-width:439px){.pick button[aria-pressed=true] .ok{display:none}}   /* sem espaço para o ✓; o fundo cheio (e o contorno no Ocupado) chegam */
+@media(max-width:379px){.day{grid-template-areas:"name bar" "pick pick" "who who"}}
 /* 900px ou mais: a semana como um horário de 7 colunas */
 @media(min-width:900px){.dname,.bar{order:-2}.pick{order:-1}   /* botões logo abaixo do dia: alinhados entre colunas */
 .dname::after{content:"\a0";font-size:12px;line-height:16px;margin-top:2px}   /* linha reservada em todos os dias: o "Melhor dia" não desalinha a coluna */
