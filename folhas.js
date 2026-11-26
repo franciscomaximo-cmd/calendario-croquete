@@ -16,10 +16,11 @@ window.Folhas = (() => {
       f.classList.remove('dobrar', 'baixo');
       f.style.zIndex = i === mov ? 4 : i === c ? 3 : 1;
       f.inert = i !== c;
-      const clip = f.querySelector(':scope > .clip');
-      if (clip) { clip.style.cssText = ''; clip.firstElementChild.style.cssText = ''; }
+      // todas as camadas temporárias da dobra voltam ao repouso (sem transform nem tamanhos)
+      f.querySelectorAll(':scope > .clip, :scope > .clip > .conteudo, :scope > .clip > .vinco, :scope > .sombra-baixo').forEach(x => x.removeAttribute('style'));
     });
     aba.classList.remove('on');
+    [aba, abaClip, abaPapel, abaCurva].forEach(x => x.removeAttribute('style'));
     indicadores();
     ajustar();
     if (ro) { ro.disconnect(); ro.observe(semanas); const d = folhas[c] && folhas[c].querySelector('.days'); if (d) ro.observe(d); }
@@ -87,53 +88,51 @@ window.Folhas = (() => {
       sb.style.transform = `translate(${M.x}px,${M.y}px) rotate(${ang + Math.PI}rad) translate(0,${-s / 2}px)`;
     }
   }
-  // até onde a dobra tem de ir para a folha sair toda: maior projeção dos cantos na direção n
-  function extensao(G, n){ return Math.max(...[[0, 0], [W, 0], [0, H], [W, H]].map(([x, y]) => (x - G.x) * n.x + (y - G.y) * n.y)) }
 
-  // ---- mola em 2D: leva F até ao alvo, partindo da velocidade do dedo ----
-  function mola(i, j, G, F0, V0, alvo, fim){
+  // ---- geometria simples: dois eixos, dobra paralela à margem ----
+  // O puxador é sempre o canto de baixo à direita (G). F = G + u·k (+ um pouco de inclinação no início, junto ao canto);
+  // a dobra fica a k/2 da margem, paralela a ela. k = 2·span: a folha saiu toda.
+  const EIXO = { x: { u: { x: -1, y: 0 }, perp: { x: 0, y: -1 } }, y: { u: { x: 0, y: -1 }, perp: { x: -1, y: 0 } } };
+  const spanDe = eixo => eixo === 'x' ? W : H;
+  function pontoF(G, eixo, k, inclina = true){
+    const { u, perp } = EIXO[eixo], t = inclina ? k * 0.12 * Math.max(0, 1 - k / spanDe(eixo)) : 0;
+    return { x: G.x + u.x * k + perp.x * t, y: G.y + u.y * k + perp.y * t };
+  }
+  const canto = () => ({ x: W, y: H });
+  // ressalto (primeira / última folha): a margem de onde o dedo parte levanta no máximo 32 px
+  function ressaltoF(G, eixo, sinal, k){ const u = EIXO[eixo].u; return { x: G.x + u.x * sinal * k, y: G.y + u.y * sinal * k } }
+
+  // ---- mola em 1D sobre k (quanto a folha está enrolada); desenhar(k) põe a dobra ----
+  function mola(k0, v0, alvo, desenharK, fim){
     animando = true;
-    const F = { ...F0 }, V = { ...V0 }; let t0 = performance.now();
-    const k = 240, amort = 30;
+    let k = k0, v = v0, t0 = performance.now();
     const passo = t => {
       const dt = Math.min((t - t0) / 1000, 1 / 30); t0 = t;
-      V.x += (k * (alvo.x - F.x) - amort * V.x) * dt; V.y += (k * (alvo.y - F.y) - amort * V.y) * dt;
-      F.x += V.x * dt; F.y += V.y * dt;
-      if (Math.hypot(alvo.x - F.x, alvo.y - F.y) < 0.6 && Math.hypot(V.x, V.y) < 20) { fim(); return; }
-      desenhar(i, G, F, j); requestAnimationFrame(passo);
+      v += (240 * (alvo - k) - 30 * v) * dt; k += v * dt;
+      if (Math.abs(alvo - k) < 0.6 && Math.abs(v) < 20) { fim(); return; }
+      desenharK(k); requestAnimationFrame(passo);
     };
     requestAnimationFrame(passo);
   }
-  const alvoSaida = (G, F) => {   // F onde a folha que avança saiu toda
-    const L = Math.hypot(F.x - G.x, F.y - G.y), n = L > 1 ? { x: (F.x - G.x) / L, y: (F.y - G.y) / L } : { x: -0.6, y: -0.8 };
-    const e = 2 * extensao(G, n) + 40; return { x: G.x + n.x * e, y: G.y + n.y * e };
-  };
 
   // ---- mudar de folha (setas, teclado, ligações) ----
   function irPara(i, { animar = true } = {}){
     if (animando || g || i === c || i < 0 || i >= folhas.length) return;
     medir();
     if (!animar || reduz()) { c = i; mudou(); acabar(); return; }
-    if (i > c) {   // a folha atual enrola do canto de baixo à direita; a de destino fica por baixo
-      const de = c; arrumar(de, i);
-      const G = { x: W, y: H }, F = { x: W - 1, y: H - 1.3 };
-      mola(de, i, G, F, { x: -260, y: -340 }, alvoSaida(G, F), () => { c = i; mudou(); acabar(); });
-    } else {   // a de destino desenrola-se por cima, vinda da esquerda
-      arrumar(i, c);
-      const G = { x: W, y: H * 0.7 };
-      mola(i, c, G, { x: -W - 40, y: G.y }, { x: 300, y: 0 }, G, () => { c = i; mudou(); acabar(); });
+    const G = canto(), de = c, fim = () => { c = i; mudou(); acabar(); };
+    if (i > c) {   // a atual enrola a partir da margem direita; a de destino fica por baixo
+      arrumar(de, i);
+      mola(2, 1500, 2 * W + 40, k => desenhar(de, G, pontoF(G, 'x', k), i), fim);
+    } else {       // a de destino desenrola-se por cima, vinda da esquerda
+      arrumar(i, de);
+      mola(2 * W + 40, -1500, 0, k => desenhar(i, G, pontoF(G, 'x', k, false), de), fim);
     }
   }
 
-  // ---- gesto: esquerda/cima avança, direita/baixo volta; direção predominante nas diagonais ----
-  const LADOS = { tl: 'lt', tr: 'rt', bl: 'lb', br: 'rb', t: 't', b: 'b', l: 'l', r: 'r', meio: '' };   // margens que cada zona toca
-  const OPOSTO = { l: 'r', r: 'l', t: 'b', b: 't' };
-  const PARA_DENTRO = { l: { x: 1, y: 0 }, r: { x: -1, y: 0 }, t: { x: 0, y: 1 }, b: { x: 0, y: -1 } };
+  // ---- gesto: o eixo decide-se nos primeiros 10 px e fica até largar ----
+  // esquerda / cima avança (a atual enrola da margem direita / de baixo); direita / baixo volta (a anterior desenrola-se por cima)
   const local = e => { const r = semanas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top } };
-  const pontoAgarrado = (z, p) => ({ tl: { x: 0, y: 0 }, tr: { x: W, y: 0 }, bl: { x: 0, y: H }, br: { x: W, y: H },
-    t: { x: p.x, y: 0 }, b: { x: p.x, y: H }, l: { x: 0, y: p.y }, r: { x: W, y: p.y } })[z];
-  const naMargem = (lado, p) => { const x = Math.max(0, Math.min(W, p.x)), y = Math.max(0, Math.min(H, p.y));
-    return { l: { x: 0, y }, r: { x: W, y }, t: { x, y: 0 }, b: { x, y: H } }[lado] };
 
   function comecar(e){
     if (e.button !== 0 || !e.isPrimary) return;   // só o botão principal / o primeiro dedo
@@ -142,52 +141,53 @@ window.Folhas = (() => {
     const meio = !z && caixa.classList.contains('inteira') && !!e.target.closest('.folha.atual') && !e.target.closest('input,select,textarea');
     if ((!z && !meio) || animando || g || !folhas.length) return;
     medir();
-    g = { id: e.pointerId, z: z || 'meio', p0: local(e), c0: { x: e.clientX, y: e.clientY }, modo: '', amostras: [], tardio: meio };
+    g = { id: e.pointerId, z: z || 'meio', p0: local(e), c0: { x: e.clientX, y: e.clientY }, modo: '', amostras: [] };
     if (meio) return;
     try { zonas.setPointerCapture(e.pointerId) } catch (_) {}
     e.preventDefault();   // sem seleção de texto nem scroll a partir da zona
+  }
+  // desenha o estado do gesto para um dado k
+  function pintar(G, eixo, modo, i, sinal, k){
+    if (modo === 'frente') desenhar(c, G, pontoF(G, eixo, k), c + 1);
+    else if (modo === 'tras') desenhar(i, G, pontoF(G, eixo, k, false), c);
+    else desenhar(c, G, ressaltoF(G, eixo, sinal, k), c + 1);
   }
   function mover(e){
     if (!g || e.pointerId !== g.id) return;
     const p = local(e), d = { x: p.x - g.p0.x, y: p.y - g.p0.y };
     if (!g.modo) {
-      if (Math.hypot(d.x, d.y) < (g.tardio ? 10 : 6)) return;
-      if (g.tardio) try { caixa.setPointerCapture(e.pointerId) } catch (_) {}   // a partir daqui é gesto: o botão por baixo já não recebe o clique
-      const horiz = Math.abs(d.x) >= Math.abs(d.y);
-      g.eixo = horiz ? 'x' : 'y';
-      g.u = horiz ? { x: Math.sign(d.x), y: 0 } : { x: 0, y: Math.sign(d.y) };
-      g.span = horiz ? W : H;
-      // espaço do dedo até à borda do ecrã: um arrasto "para fora" a partir de uma margem tem pouco
-      const ecra = horiz ? (d.x < 0 ? g.c0.x : innerWidth - g.c0.x) : (d.y < 0 ? g.c0.y : innerHeight - g.c0.y);
-      g.alcance = Math.max(40, Math.min(g.span * 0.6, ecra));
-      const de = horiz ? (d.x < 0 ? 'r' : 'l') : (d.y < 0 ? 'b' : 't');   // margem de onde o movimento parte
-      const avanca = horiz ? d.x < 0 : d.y < 0;
-      if (avanca ? c === folhas.length - 1 : c === 0) { g.modo = 'ressalto'; g.G = naMargem(de, g.p0); arrumar(c, c + 1); }
-      else if (avanca) {
-        arrumar(c, c + 1);
-        if (LADOS[g.z].includes(de)) { g.modo = 'frente'; g.G = pontoAgarrado(g.z, g.p0); }   // o canto agarrado segue o dedo
-        else { g.modo = 'frente-v'; g.G = naMargem(de, g.p0); }   // agarrou do outro lado: enrola a partir do lado oposto
-      } else {
-        g.modo = 'tras'; g.i = c - 1; arrumar(g.i, c);
-        g.E = [...LADOS[g.z]].find(l => (horiz ? 'lr' : 'tb').includes(l)) || de;   // a anterior entra pela margem onde se começou
-        g.e = PARA_DENTRO[g.E]; g.G = naMargem(OPOSTO[g.E], g.p0);
+      if (Math.hypot(d.x, d.y) < 10) return;
+      // começou no meio: a partir daqui é gesto (o botão por baixo já não recebe o clique). Numa zona a captura já é da zona;
+      // mudá-la para a caixa dispararia lostpointercapture e terminava o gesto.
+      if (g.z === 'meio') try { caixa.setPointerCapture(e.pointerId) } catch (_) {}
+      g.eixo = Math.abs(d.x) >= Math.abs(d.y) ? 'x' : 'y';   // fica bloqueado neste eixo até largar
+      const avanca = (g.eixo === 'x' ? d.x : d.y) < 0;
+      // espaço do dedo até à borda do ecrã nesse sentido: a partir de uma margem, "para fora" há pouco; cada píxel conta mais
+      const sp = spanDe(g.eixo), x = g.eixo === 'x';
+      g.espaco = Math.max(1, (x ? d.x : d.y) < 0 ? (x ? g.c0.x : g.c0.y) : (x ? innerWidth - g.c0.x : innerHeight - g.c0.y));
+      g.fator = 1.6 * Math.min(8, Math.max(1, 0.5 * sp / g.espaco));
+      g.G = canto(); g.sinal = 1;
+      if (avanca && c < folhas.length - 1) { g.modo = 'frente'; arrumar(c, c + 1); }
+      else if (!avanca && c > 0) { g.modo = 'tras'; g.i = c - 1; arrumar(g.i, c); }
+      else {
+        g.modo = 'ressalto'; arrumar(c, c + 1);
+        if (!avanca) { g.sinal = -1; g.G = g.eixo === 'x' ? { x: 0, y: H } : { x: W, y: 0 }; }
       }
     }
-    const dAx = Math.abs(g.eixo === 'x' ? d.x : d.y), perp = g.eixo === 'x' ? { x: 0, y: d.y * 0.5 } : { x: d.x * 0.5, y: 0 };
-    g.prog = Math.min(1.2, dAx / g.alcance);
-    if (g.modo === 'frente') g.F = { x: g.G.x + d.x, y: g.G.y + d.y };
-    else if (g.modo === 'frente-v') { const k = g.prog * 2 * g.span; g.F = { x: g.G.x + g.u.x * k + perp.x, y: g.G.y + g.u.y * k + perp.y }; }
-    else if (g.modo === 'ressalto') { const k = Math.min(32, dAx); g.F = { x: g.G.x + g.u.x * k, y: g.G.y + g.u.y * k }; }
-    else { const k = 2 * g.span * (1 - Math.min(1, g.prog)); g.F = { x: g.G.x - g.e.x * k + perp.x, y: g.G.y - g.e.y * k + perp.y }; }
-    g.amostras.push([performance.now(), g.F.x, g.F.y]); if (g.amostras.length > 6) g.amostras.shift();
-    if (!reduz()) g.modo === 'tras' ? desenhar(g.i, g.G, g.F, c) : desenhar(c, g.G, g.F, c + 1);
+    const a = g.eixo === 'x' ? d.x : d.y, span = spanDe(g.eixo);   // só conta o eixo escolhido
+    g.amostras.push([performance.now(), a]); if (g.amostras.length > 6) g.amostras.shift();
+    if (g.modo === 'frente') g.k = Math.max(0, Math.min(2 * span, -a * g.fator));
+    else if (g.modo === 'tras') g.k = Math.max(0, Math.min(2 * span + 40, 2 * span + 40 - a * g.fator));
+    else g.k = Math.min(32, Math.max(0, -a * g.sinal * 0.5));
+    if (!reduz()) pintar(g.G, g.eixo, g.modo, g.i, g.sinal, g.k);
   }
   function largar(e){
     if (!g || (e && e.pointerId !== g.id)) return;
     const s = g.amostras, a = s[0], b = s[s.length - 1];
     const dt = a && b && b[0] > a[0] ? (b[0] - a[0]) / 1000 : 1;
-    const V = a ? { x: (b[1] - a[1]) / dt, y: (b[2] - a[2]) / dt } : { x: 0, y: 0 };
-    const { modo, G, F, i, prog, e: ent, span, z } = g; g = null;
+    const vDedo = a ? (b[1] - a[1]) / dt : 0;   // px/s no eixo; negativo = para a esquerda / para cima
+    const sacode = b && Math.abs(b[1]) >= Math.min(40, (g.espaco || 40) * 0.6);   // a velocidade só conta com pelo menos 40 px de dedo (ou 60% do espaço até à borda)
+    const { modo, G, eixo, i, k, z, sinal, fator } = g; g = null;
     if (!modo) {
       // toque curto numa zona: vale para o que está por baixo (um botão de um dia que passou por baixo da margem)
       if (e && e.type === 'pointerup' && z !== 'meio') {
@@ -197,23 +197,23 @@ window.Folhas = (() => {
       }
       acabar(); return;
     }
-    const assenta = () => { arrumar(); acabar(); };
-    if (modo === 'ressalto') { reduz() ? assenta() : mola(c, c + 1, G, F, V, G, assenta); return; }
+    const assenta = () => { arrumar(); acabar(); }, span = spanDe(eixo), vk = -vDedo * (fator || 1.6);   // vk > 0: a enrolar mais
+    const pinta = kk => pintar(G, eixo, modo, i, sinal, kk);
+    if (modo === 'ressalto') { if (reduz()) assenta(); else mola(k, 0, 0, pinta, assenta); return; }
     if (modo === 'tras') {
-      const ve = V.x * ent.x + V.y * ent.y;   // velocidade no sentido em que a folha desenrola
-      const completa = (prog > 0.45 || ve > 600) && ve > -400;
+      const prog = 1 - k / (2 * span + 40);   // 0 = ainda escondida, 1 = assente
+      const completa = (prog > 0.3 || (sacode && vk < -500)) && vk < 400;
       if (reduz()) { if (completa) { c = i; mudou(); } else arrumar(); acabar(); return; }
-      if (completa) mola(i, c, G, F, V, G, () => { c = i; mudou(); acabar(); });
-      else mola(i, c, G, F, V, { x: G.x - ent.x * (2 * span + 40), y: G.y - ent.y * (2 * span + 40) }, assenta);
+      if (completa) mola(k, vk, 0, pinta, () => { c = i; mudou(); acabar(); });
+      else mola(k, vk, 2 * span + 40, pinta, assenta);
       return;
     }
-    const L = Math.hypot(F.x - G.x, F.y - G.y), n = { x: (F.x - G.x) / (L || 1), y: (F.y - G.y) / (L || 1) };
-    const q = L / (2 * extensao(G, n)), vn = V.x * n.x + V.y * n.y;
-    // a dobra passou o meio da folha (q=0.25), ou um gesto rápido; a partir do lado oposto (pouco espaço até à borda) pede 40% do caminho
-    const completa = (q > (modo === 'frente-v' ? 0.4 : 0.25) || vn > 700) && vn > -400;
+    // a dobra passou 20% da folha, ou um gesto rápido para o lado certo
+    const completa = (k / (2 * span) > 0.2 || (sacode && vk > 500)) && vk > -400;
     if (reduz()) { if (completa) { c++; mudou(); } else arrumar(); acabar(); return; }
-    if (completa) { const de = c; mola(de, de + 1, G, F, V, alvoSaida(G, F), () => { c = de + 1; mudou(); acabar(); }); }
-    else mola(c, c + 1, G, F, V, G, assenta);
+    const de = c;
+    if (completa) mola(k, vk, 2 * span + 40, pinta, () => { c = de + 1; mudou(); acabar(); });
+    else mola(k, vk, 0, pinta, assenta);
   }
 
   function montar(cx, opcoes = {}){
