@@ -76,8 +76,10 @@ function render(){
   // quem está a escrever o motivo não perde o texto, o foco nem o cursor quando a página se redesenha (ex.: tempo real)
   const ativo = document.activeElement;
   const rascunho = ativo && ativo.classList.contains('nota-in') ? { k: ativo.dataset.k, v: ativo.value, a: ativo.selectionStart, b: ativo.selectionEnd } : null;
+  const folhaFoco = ativo && ativo.classList.contains('folha') ? ativo.dataset.i : null;   // foco no teclado fica na folha refeita
   aRedesenhar = true;
   try { desenhar() } finally { aRedesenhar = false }
+  if (folhaFoco !== null) { const f = document.querySelector(`#weeks > .folha[data-i="${folhaFoco}"]`); if (f) f.focus({ preventScroll: true }) }
   const i = rascunho && document.querySelector(`.nota-in[data-k="${rascunho.k}"]`);
   if (i) { i.value = rascunho.v; i.focus({ preventScroll: true }); i.setSelectionRange(rascunho.a, rascunho.b) }
 }
@@ -133,7 +135,8 @@ function desenhar(){
     const el = document.querySelector(`.day[data-k="${best.k}"]`); if (el) el.classList.add('top');
   } else {
     b.className = 'best empty';
-    b.innerHTML = '<h2 class="t">Ainda ninguém está livre</h2><p class="s">Marca os dias em que podes e o melhor aparece aqui.</p>';
+    // curto: numa linha; a explicação só enquanto ninguém marcou nada
+    b.innerHTML = '<h2 class="t">Ainda ninguém está livre</h2>' + (ids.length ? '' : '<p class="s">Marca os dias em que podes.</p>');
   }
 
   const outros = Object.keys(pessoas).filter(id => id !== myId && pessoas[id].trim())
@@ -304,10 +307,12 @@ function trocarPara(id){
 // Escolher um nome não troca logo: pede "Sou eu" e depois oferece "Desfazer"
 $('#claim').addEventListener('change', e => {
   const id = e.target.value; e.target.value = ''; if (!id) return;
+  $('.alt').open = false;
   toast('Marcar como '+nameOf(id)+'?', false, { label: 'Sou eu', fn: () => trocarPara(id) });
 });
 
 document.addEventListener('click', e => {
+  if ($('.alt').open && !e.target.closest('.alt')) $('.alt').open = false;   // menu do "outro dispositivo" fecha ao tocar fora
   if (e.target.closest('.toast button') && toastAcao) { toastAcao.fn(); return }
   if (e.target.id === 'soueu' && dupId) { trocarPara(dupId); return }
   const ola = e.target.closest('#olanomes button');
@@ -330,6 +335,7 @@ document.addEventListener('click', e => {
     const dia = document.getElementById(lig.getAttribute('href').slice(1)), folha = dia && dia.closest('.folha');
     if (!folha) return;
     e.preventDefault();
+    if (Folhas.ocupado()) return;   // a meio de uma dobra: não deslizar para um dia de outra folha
     Folhas.irPara(Number(folha.dataset.i), { animar: false });
     dia.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
     dia.classList.add('destaque'); setTimeout(() => dia.classList.remove('destaque'), 1500);
@@ -365,10 +371,11 @@ async function carregar(){
 $('#nick').value = store.get('fds_nome') || '';
 if ($('#nick').value) pessoas[myId] = $('#nick').value.trim();
 Folhas.montar($('#caixa'), {
-  aoMudar(i){   // folha nova: se o topo do bloco ficou acima do ecrã, subir até ele; o foco vai para a folha
-    const bloco = $('#bloco');
-    if (bloco.getBoundingClientRect().top < 0) bloco.scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
-    const f = document.querySelector(`#weeks > .folha[data-i="${i}"]`); if (f) f.focus({ preventScroll: true });
+  aoMudar(i){   // folha nova abre no topo; o foco vai para ela, exceto se veio das setas (continuam a carregar com Enter)
+    const f = document.querySelector(`#weeks > .folha[data-i="${i}"]`); if (!f) return;
+    f.querySelector('.conteudo').scrollTop = 0;
+    const a = document.activeElement;
+    if (!(a && (a.id === 'ant' || a.id === 'seg') && !a.disabled)) f.focus({ preventScroll: true });
   },
   aoAcabar(){ if (renderPendente) render() }
 });

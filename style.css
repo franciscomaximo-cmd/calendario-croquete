@@ -18,7 +18,6 @@
 --font:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
-html{scroll-padding-bottom:84px}   /* o que recebe o foco não fica escondido atrás da barra fixa das semanas */
 [hidden]{display:none!important}   /* senão um display:grid/flex numa classe ganha ao atributo hidden */
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--font);overflow-x:clip;accent-color:var(--brand);caret-color:var(--ink)}
 ::selection{background:var(--band);color:var(--bandink)}
@@ -40,10 +39,15 @@ h2{font:700 18px/1.2 var(--font);margin:0}
 /* Nome e filtros */
 .me{display:flex;flex-wrap:wrap;gap:10px 12px;align-items:end}
 .campo{display:grid;gap:4px;font-size:14px;font-weight:600;flex:1 1 150px;max-width:260px}
-.alt{flex-basis:100%;font-size:14px;color:var(--mute)}
-.alt summary{cursor:pointer;width:max-content;max-width:100%;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--edge)}
+.alt{position:relative;flex:none}   /* "Já marcaste noutro dispositivo?" num menu pequeno ao lado do nome */
+.alt summary{list-style:none;width:44px;height:44px;border:1px solid var(--edge);border-radius:8px;display:grid;place-items:center;cursor:pointer;color:var(--ink)}
+.alt summary::-webkit-details-marker{display:none}
+.alt summary svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .alt summary:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
-.alt select{margin-top:8px}
+.alt[open] summary{border-color:var(--ink)}
+.alt .menu{position:absolute;right:0;top:50px;z-index:20;width:min(280px,calc(100vw - 24px));background:var(--bg);border:1px solid var(--edge);border-radius:10px;padding:12px;box-shadow:0 8px 24px rgb(0 0 0/.18);font-size:14px;color:var(--mute)}
+.alt .menu p{margin:0 0 8px}
+.alt select{width:100%}
 input[type=text],input[type=email],input[type=password],select{font:16px var(--font);padding:9px 12px;border:1px solid var(--edge);border-radius:8px;background:var(--bg);color:var(--ink);min-height:44px;max-width:100%}
 input[type=text],input[type=email],input[type=password]{width:100%}
 ::placeholder{color:var(--mute);opacity:1}
@@ -105,7 +109,7 @@ input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid 
 .zonas [data-z=bl]{left:0;bottom:0;width:56px;height:56px}
 .zonas [data-z=br]{right:0;bottom:0;width:56px;height:56px}
 /* barra de navegação presa ao fundo do ecrã enquanto o bloco está à vista */
-.mudar{position:sticky;bottom:0;z-index:8;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:14px;padding:10px 0 calc(10px + env(safe-area-inset-bottom,0px));background:var(--bg);border-top:1px solid var(--line)}
+.mudar{position:relative;z-index:8;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:14px;padding:10px 0 calc(10px + env(safe-area-inset-bottom,0px));background:var(--bg);border-top:1px solid var(--line)}
 .seta{width:44px;height:44px;flex:none;border-radius:22px;border:1px solid var(--edge);background:var(--bg);color:var(--ink);cursor:pointer;display:grid;place-items:center}
 .seta svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 .seta:disabled{opacity:.35;cursor:default}
@@ -115,6 +119,51 @@ input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid 
 .qual{font-size:14px;color:var(--mute);font-variant-numeric:tabular-nums;white-space:nowrap}
 .mudar .more{margin:0;padding:0 14px}
 @media(max-width:479px){.mudar:has(.more:not([hidden])) :is(.pontos,.qual){display:none}}   /* última folha no telemóvel: o botão diz onde estás e a barra fica numa linha */
+
+/* Ecrã único (index.html, body.app): sem scroll na página; a folha ocupa a altura que sobra até à barra das semanas.
+   Se a semana não couber, folhas.js põe .compacta; se nem assim, a folha faz scroll por dentro e só as margens folheiam. */
+.app{height:100vh;height:100dvh;display:flex;flex-direction:column;overflow:clip}
+.app .topo{flex:none;padding:8px 12px}
+.app h1{font-size:17px;line-height:1.2}
+.app .band{flex:1;min-height:0;display:flex;padding:8px 12px 0}
+.app .band>.wrap{flex:1;min-height:0;display:flex;flex-direction:column;overflow:clip}
+.app .ola{padding:12px;gap:8px;margin-bottom:8px}
+.app .ola h2{font-size:18px}
+.app .warn{padding:6px 10px;margin-bottom:8px;font-size:13px}
+.app .me{flex-wrap:wrap;gap:6px 8px;align-items:center}
+.app .campo{flex:1 1 120px;max-width:320px}
+.app #vista{flex:none;width:auto;max-width:46%}
+.app .best{flex:none;margin:8px 0 6px;padding:6px 0;display:flex;align-items:baseline;gap:8px;white-space:nowrap;overflow:hidden}
+.app .best .t{font-size:17px;flex:none;text-wrap:nowrap}
+.app .best.empty .t{font-size:15px;font-family:var(--font);font-weight:600;color:var(--mute)}
+.app .best .t .lbl{font-size:15px}
+.app .best .t a{text-underline-offset:4px}
+.app .best .s{margin:0;font-size:14px;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.app .best .top3{display:none}
+.app .status:not(.erro){position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}   /* "N pessoas no grupo…" só para o leitor de ecrã; erros à vista */
+.app .status{margin:0 0 6px}
+.app .bloco{flex:1;min-height:0;display:flex;flex-direction:column;margin:0}
+.app .lombada{flex:none;height:22px}
+.app .folhas-caixa{flex:1;min-height:0}
+.app .folhas{height:100%;grid-template-rows:minmax(0,1fr)}
+.app .folha,.app .clip{min-height:0}
+.app .conteudo{min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;padding-bottom:34px}
+.app .dobrar .conteudo,.app .folha.baixo .conteudo{overflow:hidden}   /* sem barra de scroll a meio da dobra (o scrollTop fica) */
+.app .mudar{flex:none;margin-top:6px;padding:6px 0 calc(6px + env(safe-area-inset-bottom,0px))}
+.app .toast{bottom:calc(70px + env(safe-area-inset-bottom,0px))}   /* por cima da barra das semanas, não tapa as setas */
+.folhas-caixa.inteira .folhas{touch-action:none;-webkit-user-select:none;user-select:none}   /* a folha cabe: folheia-se a partir de qualquer ponto */
+.folhas-caixa.inteira input{-webkit-user-select:text;user-select:text}
+@media(max-width:899px){   /* semana que não cabe: linhas mais baixas */
+  .compacta .conteudo{padding-top:8px;padding-bottom:20px}
+  .compacta .wk header{margin-bottom:6px}
+  .compacta .wk h2{font-size:16px}
+  .compacta .day{padding:4px 10px;gap:2px 10px}
+  .compacta .dname{line-height:1.15}
+  .compacta .dname .n{font-size:12px;line-height:1.1}
+  .compacta .day.top .dname::after{font-size:11px;line-height:13px;margin-top:0}
+  .compacta .pick button{min-height:38px}
+  .compacta .pastline{padding:4px 12px}
+}
 .wk header h2{font-family:var(--display)}
 .wk header{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px}
 .wk header small{color:var(--mute);font-size:14px;font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -135,7 +184,7 @@ input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid 
 /* talvez = livres+talvez por baixo; livres por cima */
 .bar i{position:absolute;inset:0;transform-origin:left;transform:scaleX(var(--v,0))}
 .bar .y{background:var(--yes)}.bar .m{background:var(--maybebar)}
-.day.destaque{box-shadow:inset 0 0 0 2px var(--brand)}   /* dia aberto a partir do "Melhor dia" (app.js tira-o 1,5 s depois) */
+.day.destaque{box-shadow:inset 0 0 0 4px var(--brand)}   /* mais grosso que o contorno do melhor dia (2px), senão não se via */   /* dia aberto a partir do "Melhor dia" (app.js tira-o 1,5 s depois) */
 .pick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
 .pick button{font:600 14px var(--font);min-height:44px;border-radius:8px;border:1px solid var(--edge);background:var(--bg);color:var(--ink);cursor:pointer;padding:4px;display:inline-flex;align-items:center;justify-content:center;gap:4px}
 .pick button.y{color:var(--yestxt);border-color:var(--yes);font-weight:700}   /* Livre é a resposta que mais interessa */
@@ -221,7 +270,7 @@ input[aria-invalid=true]{border-color:var(--erro);border-width:2px}
 /* pontos de quebra ~50 px acima dos antigos: a folha (margens + contorno) come essa largura */
 @media(max-width:449px){.pick button{font-size:13px;padding:2px;gap:2px}}
 @media(max-width:439px){.pick button[aria-pressed=true] .ok{display:none}}   /* sem espaço para o ✓; o fundo cheio (e o contorno no Ocupado) chegam */
-@media(max-width:379px){.day{grid-template-areas:"name bar" "pick pick" "who who"}}
+@media(max-width:349px){.day{grid-template-areas:"name bar" "pick pick" "who who"}}   /* margens da página de 12 px: a 360 os três botões ainda cabem ao lado do dia */
 /* 900px ou mais: a semana como um horário de 7 colunas */
 @media(min-width:900px){.dname,.bar{order:-2}.pick{order:-1}   /* botões logo abaixo do dia: alinhados entre colunas */
 .dname::after{content:"\a0";font-size:12px;line-height:16px;margin-top:2px}   /* linha reservada em todos os dias: o "Melhor dia" não desalinha a coluna */

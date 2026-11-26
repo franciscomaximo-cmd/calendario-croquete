@@ -5,7 +5,7 @@
 // na linha da dobra). Parada, a folha fica sem transform e o texto nítido.
 window.Folhas = (() => {
   const reduz = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let semanas, aba, abaClip, abaPapel, abaCurva, zonas, op = {};
+  let caixa, semanas, aba, abaClip, abaPapel, abaCurva, zonas, ro, op = {};
   let folhas = [], c = 0, W = 0, H = 0, animando = false, g = null;
 
   // ---- estado e indicadores ----
@@ -21,10 +21,23 @@ window.Folhas = (() => {
     });
     aba.classList.remove('on');
     indicadores();
+    ajustar();
+    if (ro) { ro.disconnect(); ro.observe(semanas); const d = folhas[c] && folhas[c].querySelector('.days'); if (d) ro.observe(d); }
+  }
+  // A folha atual cabe na altura? Se não, linhas mais baixas (.compacta); se nem assim, scroll por dentro
+  // e só as margens folheiam. Cabendo (.inteira), folheia-se a partir de qualquer ponto da folha.
+  function ajustar(){
+    const k = folhas[c] && folhas[c].querySelector('.conteudo');
+    if (!k || animando || g) return;
+    const cabe = () => k.scrollHeight <= k.clientHeight + 1;
+    caixa.classList.remove('compacta');
+    let ok = cabe();
+    if (!ok) { caixa.classList.add('compacta'); ok = cabe(); }
+    caixa.classList.toggle('inteira', ok);
   }
   function indicadores(){
     const n = folhas.length, pontos = document.getElementById('pontos');
-    pontos.hidden = n > 12;   // a partir de 12 folhas só "Semana x de N", para caber em 390 px
+    pontos.hidden = n > 8;   // a partir de 8 folhas só "Semana x de N": 10 pontos já não cabem a 375 px
     pontos.innerHTML = Array.from({ length: n }, (_, k) => `<i${k === c ? ' class="on"' : ''}></i>`).join('');
     const qual = document.getElementById('qual'), texto = `Semana ${c + 1} de ${n}`;
     if (qual.textContent !== texto) qual.textContent = texto;
@@ -38,7 +51,7 @@ window.Folhas = (() => {
     arrumar();
   }
   function mudou(){ arrumar(); if (op.aoMudar) op.aoMudar(c); }
-  function acabar(){ animando = false; if (op.aoAcabar) op.aoAcabar(); }
+  function acabar(){ animando = false; ajustar(); if (op.aoAcabar) op.aoAcabar(); }
 
   // ---- geometria da dobra (coordenadas da folha: 0,0 no canto de cima à esquerda) ----
   function medir(){ const r = folhas[c].getBoundingClientRect(); W = r.width; H = r.height; }
@@ -113,7 +126,7 @@ window.Folhas = (() => {
   }
 
   // ---- gesto: esquerda/cima avança, direita/baixo volta; direção predominante nas diagonais ----
-  const LADOS = { tl: 'lt', tr: 'rt', bl: 'lb', br: 'rb', t: 't', b: 'b', l: 'l', r: 'r' };   // margens que cada zona toca
+  const LADOS = { tl: 'lt', tr: 'rt', bl: 'lb', br: 'rb', t: 't', b: 'b', l: 'l', r: 'r', meio: '' };   // margens que cada zona toca
   const OPOSTO = { l: 'r', r: 'l', t: 'b', b: 't' };
   const PARA_DENTRO = { l: { x: 1, y: 0 }, r: { x: -1, y: 0 }, t: { x: 0, y: 1 }, b: { x: 0, y: -1 } };
   const local = e => { const r = semanas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top } };
@@ -123,10 +136,14 @@ window.Folhas = (() => {
     return { l: { x: 0, y }, r: { x: W, y }, t: { x, y: 0 }, b: { x, y: H } }[lado] };
 
   function comecar(e){
+    if (e.button !== 0 || !e.isPrimary) return;   // só o botão principal / o primeiro dedo
     const z = e.target.dataset && e.target.dataset.z;
-    if (!z || animando || g || !folhas.length) return;
+    // fora das zonas: só com a folha inteira à vista, e só depois de o dedo andar (um toque curto continua a marcar)
+    const meio = !z && caixa.classList.contains('inteira') && !!e.target.closest('.folha.atual') && !e.target.closest('input,select,textarea');
+    if ((!z && !meio) || animando || g || !folhas.length) return;
     medir();
-    g = { id: e.pointerId, z, p0: local(e), c0: { x: e.clientX, y: e.clientY }, modo: '', amostras: [] };
+    g = { id: e.pointerId, z: z || 'meio', p0: local(e), c0: { x: e.clientX, y: e.clientY }, modo: '', amostras: [], tardio: meio };
+    if (meio) return;
     try { zonas.setPointerCapture(e.pointerId) } catch (_) {}
     e.preventDefault();   // sem seleção de texto nem scroll a partir da zona
   }
@@ -134,7 +151,8 @@ window.Folhas = (() => {
     if (!g || e.pointerId !== g.id) return;
     const p = local(e), d = { x: p.x - g.p0.x, y: p.y - g.p0.y };
     if (!g.modo) {
-      if (Math.hypot(d.x, d.y) < 6) return;
+      if (Math.hypot(d.x, d.y) < (g.tardio ? 10 : 6)) return;
+      if (g.tardio) try { caixa.setPointerCapture(e.pointerId) } catch (_) {}   // a partir daqui é gesto: o botão por baixo já não recebe o clique
       const horiz = Math.abs(d.x) >= Math.abs(d.y);
       g.eixo = horiz ? 'x' : 'y';
       g.u = horiz ? { x: Math.sign(d.x), y: 0 } : { x: 0, y: Math.sign(d.y) };
@@ -169,8 +187,16 @@ window.Folhas = (() => {
     const s = g.amostras, a = s[0], b = s[s.length - 1];
     const dt = a && b && b[0] > a[0] ? (b[0] - a[0]) / 1000 : 1;
     const V = a ? { x: (b[1] - a[1]) / dt, y: (b[2] - a[2]) / dt } : { x: 0, y: 0 };
-    const { modo, G, F, i, prog, e: ent, span } = g; g = null;
-    if (!modo) { acabar(); return; }
+    const { modo, G, F, i, prog, e: ent, span, z } = g; g = null;
+    if (!modo) {
+      // toque curto numa zona: vale para o que está por baixo (um botão de um dia que passou por baixo da margem)
+      if (e && e.type === 'pointerup' && z !== 'meio') {
+        const el = document.elementsFromPoint(e.clientX, e.clientY).find(x => !zonas.contains(x));
+        const alvo = el && el.closest('button,a,input,select,summary');
+        if (alvo && !alvo.closest('[inert]')) { alvo.focus({ preventScroll: true }); if (alvo.tagName !== 'INPUT' && alvo.tagName !== 'SELECT') alvo.click(); }
+      }
+      acabar(); return;
+    }
     const assenta = () => { arrumar(); acabar(); };
     if (modo === 'ressalto') { reduz() ? assenta() : mola(c, c + 1, G, F, V, G, assenta); return; }
     if (modo === 'tras') {
@@ -184,22 +210,24 @@ window.Folhas = (() => {
     const L = Math.hypot(F.x - G.x, F.y - G.y), n = { x: (F.x - G.x) / (L || 1), y: (F.y - G.y) / (L || 1) };
     const q = L / (2 * extensao(G, n)), vn = V.x * n.x + V.y * n.y;
     // a dobra passou o meio da folha (q=0.25), ou um gesto rápido; a partir do lado oposto (pouco espaço até à borda) pede 40% do caminho
-    const completa = (q > (modo === 'frente-v' ? 0.4 : 0.28) || vn > 700) && vn > -400;
+    const completa = (q > (modo === 'frente-v' ? 0.4 : 0.25) || vn > 700) && vn > -400;
     if (reduz()) { if (completa) { c++; mudou(); } else arrumar(); acabar(); return; }
     if (completa) { const de = c; mola(de, de + 1, G, F, V, alvoSaida(G, F), () => { c = de + 1; mudou(); acabar(); }); }
     else mola(c, c + 1, G, F, V, G, assenta);
   }
 
-  function montar(caixa, opcoes = {}){
-    op = opcoes;
+  function montar(cx, opcoes = {}){
+    op = opcoes; caixa = cx;
     semanas = caixa.querySelector('#weeks');
     aba = caixa.querySelector('.aba'); abaClip = aba.querySelector('.aba-clip'); abaPapel = aba.querySelector('.aba-papel'); abaCurva = aba.querySelector('.aba-curva');
     zonas = caixa.querySelector('.zonas');
-    zonas.addEventListener('pointerdown', comecar);
-    zonas.addEventListener('pointermove', mover);
-    zonas.addEventListener('pointerup', largar);
-    zonas.addEventListener('pointercancel', largar);
-    zonas.addEventListener('lostpointercapture', largar);   // botão largado fora da janela: a folha não fica presa
+    // na caixa: apanha as zonas (que estão dentro dela) e, com a folha inteira à vista, a folha toda
+    caixa.addEventListener('pointerdown', comecar);
+    caixa.addEventListener('pointermove', mover);
+    caixa.addEventListener('pointerup', largar);
+    caixa.addEventListener('pointercancel', largar);
+    caixa.addEventListener('lostpointercapture', largar);   // botão largado fora da janela: a folha não fica presa
+    if (window.ResizeObserver) ro = new ResizeObserver(() => ajustar());   // ecrã rodado, barra do browser, motivo aberto
     document.getElementById('seg').addEventListener('click', () => irPara(c + 1));
     document.getElementById('ant').addEventListener('click', () => irPara(c - 1));
     addEventListener('keydown', e => {
