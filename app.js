@@ -68,7 +68,9 @@ function atualizarMotivo(k){
   if (c && mine()[k]) c.outerHTML = chipHtml({ id: myId, v: mine()[k] }, k);
 }
 
-let aRedesenhar = false, renderPendente = false;
+let aRedesenhar = false, renderPendente = false, maisPendente = false;
+// "Ver mais semanas": +4 folhas e avança para a primeira nova
+function maisSemanas(){ const antes = weeksShown; weeksShown += 4; render(); Folhas.irPara(antes) }
 function render(){
   // a meio de uma dobra o DOM das folhas não pode ser refeito: redesenha quando a folha assentar (aoAcabar)
   if (Folhas.ocupado()) { renderPendente = true; return }
@@ -328,7 +330,7 @@ document.addEventListener('click', e => {
   }
   const bt = e.target.closest('.pick button');
   if (bt) { setDia(bt.dataset.k, bt.dataset.v); return }
-  if (e.target.id === 'more') { const antes = weeksShown; weeksShown += 4; render(); Folhas.irPara(antes); return }
+  if (e.target.id === 'more') { if (Folhas.ocupado()) maisPendente = true; else maisSemanas(); return }   // a meio de um ressalto: quando a folha assentar
   // "Melhor dia" e "Também dá": mudar para a folha desse dia e destacá-lo
   const lig = e.target.closest('a[href^="#d-"]');
   if (lig) {
@@ -377,7 +379,7 @@ Folhas.montar($('#caixa'), {
     const a = document.activeElement;
     if (!(a && (a.id === 'ant' || a.id === 'seg') && !a.disabled)) f.focus({ preventScroll: true });
   },
-  aoAcabar(){ if (renderPendente) render() }
+  aoAcabar(){ if (renderPendente) render(); if (maisPendente) { maisPendente = false; maisSemanas() } }
 });
 render();
 
