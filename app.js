@@ -68,8 +68,11 @@ function atualizarMotivo(k){
   if (c && mine()[k]) c.outerHTML = chipHtml({ id: myId, v: mine()[k] }, k);
 }
 
-let aRedesenhar = false;
+let aRedesenhar = false, renderPendente = false;
 function render(){
+  // a meio de uma dobra o DOM das folhas não pode ser refeito: redesenha quando a folha assentar (aoAcabar)
+  if (Folhas.ocupado()) { renderPendente = true; return }
+  renderPendente = false;
   // quem está a escrever o motivo não perde o texto, o foco nem o cursor quando a página se redesenha (ex.: tempo real)
   const ativo = document.activeElement;
   const rascunho = ativo && ativo.classList.contains('nota-in') ? { k: ativo.dataset.k, v: ativo.value, a: ativo.selectionStart, b: ativo.selectionEnd } : null;
@@ -320,7 +323,17 @@ document.addEventListener('click', e => {
   }
   const bt = e.target.closest('.pick button');
   if (bt) { setDia(bt.dataset.k, bt.dataset.v); return }
-  if (e.target.id === 'more') { weeksShown += 4; render() }
+  if (e.target.id === 'more') { const antes = weeksShown; weeksShown += 4; render(); Folhas.irPara(antes); return }
+  // "Melhor dia" e "Também dá": mudar para a folha desse dia e destacá-lo
+  const lig = e.target.closest('a[href^="#d-"]');
+  if (lig) {
+    const dia = document.getElementById(lig.getAttribute('href').slice(1)), folha = dia && dia.closest('.folha');
+    if (!folha) return;
+    e.preventDefault();
+    Folhas.irPara(Number(folha.dataset.i), { animar: false });
+    dia.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    dia.classList.add('destaque'); setTimeout(() => dia.classList.remove('destaque'), 1500);
+  }
 });
 
 $('#vista').value = soFds ? 'fds' : 'all';
@@ -351,7 +364,14 @@ async function carregar(){
 
 $('#nick').value = store.get('fds_nome') || '';
 if ($('#nick').value) pessoas[myId] = $('#nick').value.trim();
-Folhas.montar($('#caixa'), { aoMudar(){}, aoAcabar(){} });
+Folhas.montar($('#caixa'), {
+  aoMudar(i){   // folha nova: se o topo do bloco ficou acima do ecrã, subir até ele; o foco vai para a folha
+    const bloco = $('#bloco');
+    if (bloco.getBoundingClientRect().top < 0) bloco.scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    const f = document.querySelector(`#weeks > .folha[data-i="${i}"]`); if (f) f.focus({ preventScroll: true });
+  },
+  aoAcabar(){ if (renderPendente) render() }
+});
 render();
 
 if (!window.supabase || !window.SUPABASE_URL || window.SUPABASE_URL.includes('O-TEU-PROJETO')) {
